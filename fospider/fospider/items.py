@@ -8,10 +8,11 @@
 import scrapy
 
 
-class FiledownloadItem(scrapy.Item):
+class DownloadInfoItem(scrapy.Item):
     file_urls = scrapy.Field()
     files = scrapy.Field()
-
+    file_path = scrapy.Field()
+    request_header = scrapy.Field()
 
 
 class SecurityItem(scrapy.Item):

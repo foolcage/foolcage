@@ -1,8 +1,7 @@
 from scrapy import signals
 
 
-class FoDownloaderMiddleware(object):
-
+class DownloadFileMiddleware(object):
     def __init__(self, timeout=180):
         self._timeout = timeout
 

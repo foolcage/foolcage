@@ -1,16 +1,17 @@
 import scrapy
 from scrapy import signals
 
-from fospider.items import FiledownloadItem
+from fospider.items import DownloadInfoItem
 
 
 class DownloadSpider(scrapy.Spider):
     name = "download"
+    download_info_item = None
     custom_settings = {
         "ITEM_PIPELINES": {'fospider.pipelines.FoFilesPipeline': 1},
-        "DOWNLOADER_MIDDLEWARES": {
-            'fospider.middlewares.FoMiddleware.FoDownloaderMiddleware': 1,
-        },
+        # "DOWNLOADER_MIDDLEWARES": {
+        #     'fospider.middlewares.DownloadFileMiddleware': 1,
+        # }
         "DEFAULT_REQUEST_HEADERS": {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate, sdch",
@@ -28,16 +29,12 @@ class DownloadSpider(scrapy.Spider):
         'http://query.sse.com.cn/security/stock/downloadStockListFile.do?csrcCode=&stockCode=&areaName=&stockType=1']
 
     def parse(self, response):
-        yield FiledownloadItem(
-            file_urls=[
-                'http://query.sse.com.cn/security/stock/downloadStockListFile.do?csrcCode=&stockCode=&areaName=&stockType=1',
-                'http://www.szse.cn/szseWeb/ShowReport.szse?SHOWTYPE=xlsx&CATALOGID=1110&tab2PAGENUM=1&ENCODE=1&TABKEY=tab2']
-        )
+        yield self.download_info_item
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        ok = isinstance(cls, DownloadSpider)
         spider = super(DownloadSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider.download_info_item = crawler.settings.get('download_info_item')
         crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
         return spider
 
