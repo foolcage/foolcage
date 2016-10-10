@@ -1,13 +1,16 @@
 import scrapy
+from scrapy import signals
 
 from fospider.items import FiledownloadItem
 
 
-class SecuritySpider(scrapy.Spider):
-    name = "security"
+class DownloadSpider(scrapy.Spider):
+    name = "download"
     custom_settings = {
         "ITEM_PIPELINES": {'fospider.pipelines.FoFilesPipeline': 1},
-        "FILES_STORE": './',
+        "DOWNLOADER_MIDDLEWARES": {
+            'fospider.middlewares.FoMiddleware.FoDownloaderMiddleware': 1,
+        },
         "DEFAULT_REQUEST_HEADERS": {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate, sdch",
@@ -30,3 +33,13 @@ class SecuritySpider(scrapy.Spider):
                 'http://query.sse.com.cn/security/stock/downloadStockListFile.do?csrcCode=&stockCode=&areaName=&stockType=1',
                 'http://www.szse.cn/szseWeb/ShowReport.szse?SHOWTYPE=xlsx&CATALOGID=1110&tab2PAGENUM=1&ENCODE=1&TABKEY=tab2']
         )
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        ok = isinstance(cls, DownloadSpider)
+        spider = super(DownloadSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+
+    def spider_closed(self, spider):
+        spider.logger.info('Spider closed: %s', spider.name)

@@ -13,6 +13,7 @@ class FiledownloadItem(scrapy.Item):
     files = scrapy.Field()
 
 
+
 class SecurityItem(scrapy.Item):
     code = scrapy.Field()
     exchange = scrapy.Field()
