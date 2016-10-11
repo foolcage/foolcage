@@ -1,5 +1,6 @@
 import os
 
+import openpyxl
 import scrapy
 from scrapy import Request
 
@@ -30,7 +31,7 @@ class DownloadFileSpider(scrapy.Spider):
             ''')},
         # 深圳A股列表
         'http://www.szse.cn/szseWeb/ShowReport.szse?SHOWTYPE=xlsx&CATALOGID=1110&tab1PAGENUM=1&ENCODE=1&TABKEY=tab1': {
-            'path': 'sz.xls',
+            'path': 'sz.xlsx',
             'header': chrome_copy_header_to_dict('''
                     Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
                     Accept-Encoding:gzip, deflate, sdch
@@ -53,3 +54,11 @@ class DownloadFileSpider(scrapy.Spider):
         path = os.path.join(self.settings.get('FILES_STORE'), self.download_info.get(response.url).get('path'))
         with open(path, "wb") as f:
             f.write(response.body)
+            if path.endswith('xlsx'):
+                wb = openpyxl.load_workbook(path)
+                for name in wb.get_sheet_names():
+                    sheet = wb.get_sheet_by_name(name)
+                    max_row, max_column = sheet.max_row, sheet.max_column
+                    for i in range(1, max_row):
+                        for j in range(1, max_column):
+                            print(i, sheet.cell(row=i, column=j).value)
