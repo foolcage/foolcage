@@ -1,10 +1,11 @@
 import os
 
+import chardet
 import openpyxl
 import scrapy
 from scrapy import Request
 
-from fospider.utils import chrome_copy_header_to_dict
+from fospider.utils import chrome_copy_header_to_dict, get_security_item
 
 
 class DownloadFileSpider(scrapy.Spider):
@@ -17,7 +18,7 @@ class DownloadFileSpider(scrapy.Spider):
     download_info = {
         # 上海A股列表
         'http://query.sse.com.cn/security/stock/downloadStockListFile.do?csrcCode=&stockCode=&areaName=&stockType=1': {
-            'path': 'sh.xls',
+            'path': 'sh.txt',
             'header': chrome_copy_header_to_dict('''
                     Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
                     Accept-Encoding:gzip, deflate, sdch
@@ -54,11 +55,5 @@ class DownloadFileSpider(scrapy.Spider):
         path = os.path.join(self.settings.get('FILES_STORE'), self.download_info.get(response.url).get('path'))
         with open(path, "wb") as f:
             f.write(response.body)
-            if path.endswith('xlsx'):
-                wb = openpyxl.load_workbook(path)
-                for name in wb.get_sheet_names():
-                    sheet = wb.get_sheet_by_name(name)
-                    max_row, max_column = sheet.max_row, sheet.max_column
-                    for i in range(1, max_row):
-                        for j in range(1, max_column):
-                            print(i, sheet.cell(row=i, column=j).value)
+            for item in get_security_item(path):
+                print(item)

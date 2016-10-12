@@ -89,3 +89,4 @@ ROBOTSTXT_OBEY = True
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 FILES_STORE = "data"
+DOWNLOAD_TXT_ENCODING = "GB2312"
