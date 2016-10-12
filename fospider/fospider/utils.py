@@ -1,4 +1,5 @@
 import openpyxl
+import rethinkdb as r
 
 from fospider import settings
 from fospider.items import SecurityItem
@@ -61,3 +62,24 @@ def detect_encoding(url):
     detector.close()
     usock.close()
     return detector.result.get('encoding')
+
+
+def rethinkdb_init():
+    conn = r.connect('localhost', 28015)
+    try:
+        r.db_create("foolcage").run(conn)
+        r.db("foolcage").table_create("security").run(conn)
+    except r.RqlRuntimeError as err:
+        print(err.message)
+    finally:
+        conn.close()
+
+
+def rethinkdb_insert_security_item(item):
+    conn = r.connect('localhost', 28015)
+    try:
+        r.db("foolcage").table("security").insert(item).run(conn)
+    except r.RqlRuntimeError as err:
+        print(err.message)
+    finally:
+        conn.close()

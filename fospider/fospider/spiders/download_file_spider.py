@@ -1,11 +1,9 @@
 import os
 
-import chardet
-import openpyxl
 import scrapy
 from scrapy import Request
 
-from fospider.utils import chrome_copy_header_to_dict, get_security_item
+from fospider.utils import chrome_copy_header_to_dict, get_security_item, rethinkdb_insert_security_item
 
 
 class DownloadFileSpider(scrapy.Spider):
@@ -57,3 +55,4 @@ class DownloadFileSpider(scrapy.Spider):
             f.write(response.body)
             for item in get_security_item(path):
                 print(item)
+                rethinkdb_insert_security_item(dict(item))
