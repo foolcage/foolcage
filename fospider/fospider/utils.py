@@ -1,3 +1,6 @@
+import json
+import os
+
 import openpyxl
 import rethinkdb as r
 
@@ -22,9 +25,9 @@ def chrome_copy_header_to_dict(src):
 
 
 def get_security_item(path):
-    if path.endswith("txt"):
+    if path.endswith("sh.txt"):
         return get_sh_security_item(path)
-    elif path.endswith("xlsx"):
+    elif path.endswith("sz.xlsx"):
         return get_sz_security_item(path)
 
 
@@ -64,22 +67,47 @@ def detect_encoding(url):
     return detector.result.get('encoding')
 
 
-def rethinkdb_init():
-    conn = r.connect('localhost', 28015)
-    try:
-        r.db_create("foolcage").run(conn)
-        r.db("foolcage").table_create("security").run(conn)
-    except r.RqlRuntimeError as err:
-        print(err.message)
-    finally:
-        conn.close()
+# database info
+RDB_HOST = os.environ.get('RDB_HOST') or 'localhost'
+RDB_PORT = os.environ.get('RDB_PORT') or 28015
+
+FOOLCAGE_DB = 'foolcage'
+
+TABLE_EXCHANGE = 'exchange'
+TABLE_SECURITY_TYPE = 'security_type'
+TABLE_SECURITY = 'security'
+TABLE_TICK = 'tick'
+
+conn = r.connect(host=RDB_HOST, port=RDB_PORT)
 
 
-def rethinkdb_insert_security_item(item):
-    conn = r.connect('localhost', 28015)
+def create_tables(conn):
+    if not r.table_list().contains(TABLE_EXCHANGE):
+        r.db(FOOLCAGE_DB).table_create(TABLE_EXCHANGE).run(conn)
+    if not r.table_list().contains(TABLE_SECURITY_TYPE):
+        r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY_TYPE).run(conn)
+    if not r.table_list().contains(TABLE_SECURITY):
+        r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY).run(conn)
+    if not r.table_list().contains(TABLE_TICK):
+        r.db(FOOLCAGE_DB).table_create(TABLE_TICK).run(conn)
+
+
+def db_setup():
     try:
-        r.db("foolcage").table("security").insert(item).run(conn)
+        if not r.db_list().contains(FOOLCAGE_DB):
+            r.db_create(FOOLCAGE_DB).run(conn)
+        create_tables(conn)
+    except r.RqlRuntimeError as error:
+        print(error.message)
+
+
+def db_get_securities():
+    selection = list(r.table(TABLE_SECURITY).run(conn))
+    return json.dumps(selection)
+
+
+def db_insert_security(item):
+    try:
+        r.db(FOOLCAGE_DB).table(TABLE_SECURITY).insert(item).run(conn)
     except r.RqlRuntimeError as err:
         print(err.message)
-    finally:
-        conn.close()
