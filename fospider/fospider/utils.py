@@ -31,21 +31,31 @@ def get_security_item(path):
         return get_sz_security_item(path)
 
 
+def get_tick_item(path):
+    encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
+        url='file://' + os.path.abspath(path)).get('encoding')
+    with open(path, encoding=encoding) as fr:
+        lines = fr.readlines()
+        for line in lines[1:]:
+            code, name, _, _, list_date, _, _ = line.split()
+            yield SecurityItem(code='sh' + code, name=name, list_date=list_date, exchange='sh', type='stock')
+
+
 def get_sz_security_item(path):
     wb = openpyxl.load_workbook(path)
     for name in wb.get_sheet_names():
         sheet = wb.get_sheet_by_name(name)
         max_row, max_column = sheet.max_row, sheet.max_column
-        for i in range(1, max_row):
+        for i in range(2, max_row):
             code = sheet.cell(row=i, column=1).value
             name = sheet.cell(row=i, column=2).value
             list_date = sheet.cell(row=i, column=8).value
-            yield SecurityItem(code=code, name=name, list_date=list_date, exchange='sz', type='stock')
+            yield SecurityItem(code='sz' + code, name=name, list_date=list_date, exchange='sz', type='stock')
 
 
 def get_sh_security_item(path):
     encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
-        path).get('encoding')
+        url='file://' + os.path.abspath(path)).get('encoding')
     with open(path, encoding=encoding) as fr:
         lines = fr.readlines()
         for line in lines[1:]:
@@ -54,10 +64,10 @@ def get_sh_security_item(path):
 
 
 def detect_encoding(url):
-    import urllib
+    import urllib.request
     from chardet.universaldetector import UniversalDetector
 
-    usock = urllib.urlopen(url)
+    usock = urllib.request.urlopen(url)
     detector = UniversalDetector()
     for line in usock.readlines():
         detector.feed(line)
@@ -78,7 +88,7 @@ TABLE_SECURITY_TYPE = 'security_type'
 TABLE_SECURITY = 'security'
 TABLE_TICK = 'tick'
 
-conn = r.connect(host=RDB_HOST, port=RDB_PORT)
+conn = None
 
 
 def create_tables(conn):
@@ -94,10 +104,12 @@ def create_tables(conn):
 
 def db_setup():
     try:
+        conn = r.connect(host=RDB_HOST, port=RDB_PORT)
+
         if not r.db_list().contains(FOOLCAGE_DB):
             r.db_create(FOOLCAGE_DB).run(conn)
         create_tables(conn)
-    except r.RqlRuntimeError as error:
+    except r.ReqlDriverError or r.ReqlDriverError as error:
         print(error.message)
 
 
