@@ -88,5 +88,10 @@ ROBOTSTXT_OBEY = True
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-FILES_STORE = "data"
-DOWNLOAD_TXT_ENCODING = "GB2312"
+FILES_STORE = 'data'
+SH_STOCK_FILE = 'sh.txt'
+SZ_STOCK_FILE = 'sz.xlsx'
+
+START_TICK_DATE = '2004-10-8'
+
+DOWNLOAD_TXT_ENCODING = 'GB2312'

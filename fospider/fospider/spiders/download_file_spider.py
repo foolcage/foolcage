@@ -2,7 +2,9 @@ import os
 
 import scrapy
 from scrapy import Request
+from scrapy import signals
 
+from fospider import settings
 from fospider.utils import chrome_copy_header_to_dict, get_security_item
 
 
@@ -16,7 +18,7 @@ class DownloadFileSpider(scrapy.Spider):
     security_download_info = {
         # 上海A股列表
         'http://query.sse.com.cn/security/stock/downloadStockListFile.do?csrcCode=&stockCode=&areaName=&stockType=1': {
-            'path': 'sh.txt',
+            'path': settings.SH_STOCK_FILE,
             'header': chrome_copy_header_to_dict('''
                     Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
                     Accept-Encoding:gzip, deflate, sdch
@@ -30,7 +32,7 @@ class DownloadFileSpider(scrapy.Spider):
             ''')},
         # 深圳A股列表
         'http://www.szse.cn/szseWeb/ShowReport.szse?SHOWTYPE=xlsx&CATALOGID=1110&tab1PAGENUM=1&ENCODE=1&TABKEY=tab1': {
-            'path': 'sz.xlsx',
+            'path': settings.SZ_STOCK_FILE,
             'header': chrome_copy_header_to_dict('''
                     Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
                     Accept-Encoding:gzip, deflate, sdch
@@ -44,9 +46,6 @@ class DownloadFileSpider(scrapy.Spider):
     }
     start_urls = [
         'http://www.fakeurl.com']
-
-    def get_tick_url(self, date, code):
-        return 'http://market.finance.sina.com.cn/downxls.php?date={}&symbol={}'.format(date, code)
 
     default_tick_header = chrome_copy_header_to_dict('''
 Host: market.finance.sina.com.cn
@@ -65,7 +64,7 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Geck
 
     def download_file(self, response):
         path = self.security_download_info.get(response.url).get('path')
-        if path == "sh.txt" or path == "sz.xlsx":
+        if path == settings.SZ_STOCK_FILE or path == settings.SH_STOCK_FILE:
             path = os.path.join(self.settings.get('FILES_STORE'), path)
             with open(path, "wb") as f:
                 f.write(response.body)
@@ -81,3 +80,21 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Geck
             path = os.path.join(self.settings.get('FILES_STORE'), 'ticks', path)
             with open(path, "wb") as f:
                 f.write(response.body)
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(DownloadFileSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+
+    def spider_closed(self, spider, reason):
+        spider.logger.info('Spider closed: %s,%s', spider.name, reason)
+
+    def get_tick_url(self, date, code):
+        return 'http://market.finance.sina.com.cn/downxls.php?date={}&symbol={}'.format(date, code)
+
+    def get_k_data_url(self, code, year, quarter):
+        return 'http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_FuQuanMarketHistory/stockid/{}.phtml?year={}&jidu={}'.format(
+            code, year, quarter)
+
+    def get_quarters(self, start):

@@ -24,10 +24,18 @@ def chrome_copy_header_to_dict(src):
     return header
 
 
+def is_sh_stock_file(path):
+    return path == os.path.join(settings.get('FILES_STORE'), settings.SH_STOCK_FILE)
+
+
+def is_sz_stock_file(path):
+    return path == os.path.join(settings.get('FILES_STORE'), settings.SZ_STOCK_FILE)
+
+
 def get_security_item(path):
-    if path.endswith("sh.txt"):
+    if is_sh_stock_file(path):
         return get_sh_security_item(path)
-    elif path.endswith("sz.xlsx"):
+    elif is_sz_stock_file(path):
         return get_sz_security_item(path)
 
 
@@ -77,6 +85,12 @@ def detect_encoding(url):
     return detector.result.get('encoding')
 
 
+def setup_env():
+    if not os.path.exists('data/ticks'):
+        os.makedirs('data/ticks')
+    db_setup()
+
+
 # database info
 RDB_HOST = os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
@@ -97,7 +111,7 @@ def create_tables(conn):
     if not r.table_list().contains(TABLE_SECURITY_TYPE):
         r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY_TYPE).run(conn)
     if not r.table_list().contains(TABLE_SECURITY):
-        r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY).run(conn)
+        r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY, primary_key='code').run(conn)
     if not r.table_list().contains(TABLE_TICK):
         r.db(FOOLCAGE_DB).table_create(TABLE_TICK).run(conn)
 
@@ -120,6 +134,6 @@ def db_get_securities():
 
 def db_insert_security(item):
     try:
-        r.db(FOOLCAGE_DB).table(TABLE_SECURITY).insert(item).run(conn)
+        r.db(FOOLCAGE_DB).table(TABLE_SECURITY).insert(item, conflict="error").run(conn)
     except r.RqlRuntimeError as err:
         print(err.message)
