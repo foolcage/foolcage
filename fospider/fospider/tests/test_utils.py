@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from fospider.utils import chrome_copy_header_to_dict
+from fospider.utils import chrome_copy_header_to_dict, get_quarters
 
 
 class TestUtils(TestCase):
@@ -24,3 +24,12 @@ User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/53
         assert header.get('Host') == 'www.szse.cn'
         assert header.get(
             'User-Agent') == 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36'
+
+    def test_get_quarters(self):
+        set1 = set(get_quarters('2014-4-1'))
+        assert set1 == {(2014, 2), (2014, 3), (2014, 4), (2015, 1), (2015, 2), (2015, 3), (2015, 4),
+                        (2016, 1), (2016, 2), (2016, 3), (2016, 4)}
+        set2 = set(get_quarters('2015-4-1'))
+        assert set2 == {(2015, 2), (2015, 3), (2015, 4), (2016, 1), (2016, 2), (2016, 3), (2016, 4)}
+        set3 = set(get_quarters('2016-4-1'))
+        assert set3 == {(2016, 2), (2016, 3), (2016, 4)}

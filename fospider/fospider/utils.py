@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 
@@ -25,11 +26,11 @@ def chrome_copy_header_to_dict(src):
 
 
 def is_sh_stock_file(path):
-    return path == os.path.join(settings.get('FILES_STORE'), settings.SH_STOCK_FILE)
+    return path.endswith(settings.SH_STOCK_FILE)
 
 
 def is_sz_stock_file(path):
-    return path == os.path.join(settings.get('FILES_STORE'), settings.SZ_STOCK_FILE)
+    return path.endswith(settings.SZ_STOCK_FILE)
 
 
 def get_security_item(path):
@@ -58,7 +59,8 @@ def get_sz_security_item(path):
             code = sheet.cell(row=i, column=1).value
             name = sheet.cell(row=i, column=2).value
             list_date = sheet.cell(row=i, column=8).value
-            yield SecurityItem(code='sz' + code, name=name, list_date=list_date, exchange='sz', type='stock')
+            yield SecurityItem(code_id='sz' + code, code=code, name=name, list_date=list_date, exchange='sz',
+                               type='stock')
 
 
 def get_sh_security_item(path):
@@ -68,7 +70,8 @@ def get_sh_security_item(path):
         lines = fr.readlines()
         for line in lines[1:]:
             code, name, _, _, list_date, _, _ = line.split()
-            yield SecurityItem(code=code, name=name, list_date=list_date, exchange='sh', type='stock')
+            yield SecurityItem(code_id='sh' + code, code=code, name=name, list_date=list_date, exchange='sh',
+                               type='stock')
 
 
 def detect_encoding(url):
@@ -137,3 +140,30 @@ def db_insert_security(item):
         r.db(FOOLCAGE_DB).table(TABLE_SECURITY).insert(item, conflict="error").run(conn)
     except r.RqlRuntimeError as err:
         print(err.message)
+
+
+# time utils
+def get_datetime(str):
+    return datetime.datetime.strptime(str, "%Y-%m-%d")
+
+
+def get_year_quarter(time):
+    return time.year, (time.month // 3) + 1
+
+
+def get_quarters(start):
+    start_time = get_datetime(start)
+    today = datetime.date.today()
+    start_year_quarter = get_year_quarter(start_time)
+    current_year_quarter = get_year_quarter(today)
+    if current_year_quarter[0] == start_year_quarter[0]:
+        return [(current_year_quarter[0], x) for x in range(start_year_quarter[1], current_year_quarter[1] + 1)]
+    elif current_year_quarter[0] - start_year_quarter[0] == 1:
+        return [(start_year_quarter[0], x) for x in range(start_year_quarter[1], 5)] + \
+               [(current_year_quarter[0], x) for x in range(1, current_year_quarter[1] + 1)]
+    elif current_year_quarter[0] - start_year_quarter[0] > 1:
+        return [(start_year_quarter[0], x) for x in range(start_year_quarter[1], 5)] + \
+               [(x, y) for x in range(start_year_quarter[0] + 1, current_year_quarter[0]) for y in range(1, 5)] + \
+               [(current_year_quarter[0], x) for x in range(1, current_year_quarter[1] + 1)]
+    else:
+        raise Exception("wrong start time:{}".format(start));

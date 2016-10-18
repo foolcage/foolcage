@@ -22,6 +22,7 @@ class SecurityTypeItem(scrapy.Item):
 
 
 class SecurityItem(scrapy.Item):
+    code_id = scrapy.Field()
     code = scrapy.Field()
     name = scrapy.Field()
     list_date = scrapy.Field()
@@ -35,3 +36,17 @@ class TickItem(scrapy.Item):
     price = scrapy.Field()
     volume = scrapy.Field()
     turnover = scrapy.Field()
+
+
+class KDataItem(scrapy.Item):
+    security_code = scrapy.Field()
+    open = scrapy.Field()
+    close = scrapy.Field()
+    high = scrapy.Field()
+    low = scrapy.Field()
+    high = scrapy.Field()
+    volume = scrapy.Field()
+    turnover = scrapy.Field()
+    time = scrapy.Field()
+    type = scrapy.Field()
+    fuquan = scrapy.Field()
