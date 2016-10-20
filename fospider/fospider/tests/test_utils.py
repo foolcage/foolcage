@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from fospider.utils import chrome_copy_header_to_dict, get_quarters
+from fospider.utils.utils import chrome_copy_header_to_dict, get_quarters
 
 
 class TestUtils(TestCase):

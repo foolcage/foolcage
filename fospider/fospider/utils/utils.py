@@ -89,9 +89,31 @@ def detect_encoding(url):
 
 
 def setup_env():
-    if not os.path.exists('data/ticks'):
-        os.makedirs('data/ticks')
+    if not os.path.exists('data'):
+        os.makedirs('data')
     db_setup()
+
+
+def mkdir_for_security(code_id, type):
+    root = os.path.join(settings.FILES_STORE, type, code_id)
+    if not os.path.exists(root):
+        os.makedirs(root)
+
+    kdata = os.path.join(root, 'kdata')
+    if not os.path.exists(kdata):
+        os.makedirs(kdata)
+
+    tick = os.path.join(root, 'tick')
+    if not os.path.exists(tick):
+        os.makedirs(tick)
+
+
+def get_kdata_path(code_id, type):
+    return os.path.join(settings.FILES_STORE, type, code_id, 'kdata')
+
+
+def get_tick_path(code_id, type):
+    return os.path.join(settings.FILES_STORE, type, code_id, 'tick')
 
 
 # database info

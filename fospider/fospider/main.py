@@ -1,7 +1,7 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-from fospider.utils import setup_env
+from fospider.utils.utils import setup_env
 
 setup_env()
 
