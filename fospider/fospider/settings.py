@@ -88,7 +88,7 @@ ROBOTSTXT_OBEY = True
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-FILES_STORE = '/home/xuanqi/workspace/github/foolcage/fospider/fospider/data'
+FILES_STORE = '/home/xuanqi/disk2/foolcage/data'
 SH_STOCK_FILE = 'sh.txt'
 SZ_STOCK_FILE = 'sz.xlsx'
 

@@ -1,10 +1,14 @@
+import itertools
+import os
+
 import scrapy
 from scrapy import Request
 from scrapy import signals
 
 from fospider import settings
 from fospider.consts import DEFAULT_TICK_HEADER
-from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path
+from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
+    is_available_tick, get_sz_stock_list_path
 
 
 class DownloadTickSpider(scrapy.Spider):
@@ -16,12 +20,18 @@ class DownloadTickSpider(scrapy.Spider):
     }
 
     def start_requests(self):
-        for item in get_security_item(get_sh_stock_list_path()):
+        for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
+                                    get_security_item(get_sz_stock_list_path())):
             for trading_date in get_trading_dates(item['code_id'], item['type']):
                 if trading_date < settings.START_TICK_DATE or trading_date < settings.AVAILABLE_TICK_DATE:
                     continue
+                path = get_tick_path(item['code_id'], item['type'], trading_date)
+
+                if os.path.isfile(path) and is_available_tick(path):
+                    continue
+
                 url = self.get_tick_url(trading_date, item['code_id'])
-                self.request_infos[url] = {'path': get_tick_path(item['code_id'], item['type'], trading_date)}
+                self.request_infos[url] = {'path': path}
 
                 yield Request(url, callback=self.download_file)
 

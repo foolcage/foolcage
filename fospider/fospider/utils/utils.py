@@ -141,6 +141,17 @@ def get_trading_dates(code_id, type):
     return dates
 
 
+def is_available_tick(path):
+    encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
+        url='file://' + os.path.abspath(path)).get('encoding')
+    try:
+        with open(path, encoding=encoding) as fr:
+            line = fr.readline()
+            return u'成交时间', u'成交价', u'价格变动', u'成交量(手)', u'成交额(元)', u'性质' == line.split()
+    except Exception:
+        return False
+
+
 # database info
 RDB_HOST = os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015

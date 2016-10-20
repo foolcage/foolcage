@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from fospider.utils.utils import chrome_copy_header_to_dict, get_quarters, get_trading_dates
+from fospider.utils.utils import *
 
 
 class TestUtils(TestCase):
@@ -36,5 +36,10 @@ User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/53
 
     def test_get_trading_dates(self):
         dates = get_trading_dates('sh600000', 'stock')
-        assert dates[0] == '1999-12-30'
+        assert dates[0] == '1999-11-10'
         assert dates[-1] == '2016-10-19'
+
+    def test_is_available_tick(self):
+        dir = get_tick_dir('sh600000', 'stock')
+        for f in os.listdir(dir):
+            assert is_available_tick(os.path.join(dir, f))
