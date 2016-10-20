@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from fospider.utils.utils import chrome_copy_header_to_dict, get_quarters
+from fospider.utils.utils import chrome_copy_header_to_dict, get_quarters, get_trading_dates
 
 
 class TestUtils(TestCase):
@@ -33,3 +33,8 @@ User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/53
         assert set2 == {(2015, 2), (2015, 3), (2015, 4), (2016, 1), (2016, 2), (2016, 3), (2016, 4)}
         set3 = set(get_quarters('2016-4-1'))
         assert set3 == {(2016, 2), (2016, 3), (2016, 4)}
+
+    def test_get_trading_dates(self):
+        dates = get_trading_dates('sh600000', 'stock')
+        assert dates[0] == '1999-12-30'
+        assert dates[-1] == '2016-10-19'

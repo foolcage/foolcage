@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 
@@ -9,7 +10,7 @@ from scrapy import signals
 from fospider import settings
 from fospider.consts import DEFAULT_KDATA_HEADER, DEFAULT_SH_HEADER, DEFAULT_SZ_HEADER
 from fospider.items import KDataItem
-from fospider.utils.utils import get_security_item, get_quarters, mkdir_for_security, get_kdata_path
+from fospider.utils.utils import get_security_item, get_quarters, mkdir_for_security, get_kdata_dir, get_year_quarter
 
 
 class DownloadFileSpider(scrapy.Spider):
@@ -73,15 +74,21 @@ class DownloadFileSpider(scrapy.Spider):
             for item in get_security_item(path):
                 mkdir_for_security(item['code_id'], item['type'])
 
+                current_year, current_quarter = get_year_quarter(datetime.date.today())
                 # get day k data
                 for year, quarter in get_quarters(item['list_date']):
+                    data_path = os.path.join(get_kdata_dir(item['code_id'], item['type']),
+                                             '{}-{}-d.json'.format(year, quarter))
+                    # dont't download again if exist and not current
+                    if (current_quarter != quarter or current_year != current_year) \
+                            and os.path.isfile(data_path) and not settings.FORCE_DOWNLOAD_KDATA:
+                        continue
+
                     url = self.get_k_data_url(item['code'], year, quarter)
                     self.security_download_info[url] = {
-                        'path': os.path.join(get_kdata_path(item['code_id'], item['type']),
-                                             '{}-{}-d.json'.format(year, quarter)),
+                        'path': data_path,
                         'header': DEFAULT_KDATA_HEADER,
                         'code_id': item['code_id']}
-                    self.logger.info('Parse function called on %s', response.url)
                     yield Request(url, headers=self.security_download_info.get(url).get('header'),
                                   callback=self.download_day_k_data)
                     yield item

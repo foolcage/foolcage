@@ -108,12 +108,37 @@ def mkdir_for_security(code_id, type):
         os.makedirs(tick)
 
 
-def get_kdata_path(code_id, type):
+def get_kdata_dir(code_id, type):
     return os.path.join(settings.FILES_STORE, type, code_id, 'kdata')
 
 
-def get_tick_path(code_id, type):
+def get_tick_dir(code_id, type):
     return os.path.join(settings.FILES_STORE, type, code_id, 'tick')
+
+
+def get_tick_path(code_id, type, date):
+    return os.path.join(get_tick_dir(code_id, type), date + ".xls")
+
+
+def get_sh_stock_list_path():
+    return os.path.join(settings.FILES_STORE, settings.SH_STOCK_FILE)
+
+
+def get_sz_stock_list_path():
+    return os.path.join(settings.FILES_STORE, settings.SZ_STOCK_FILE)
+
+
+def get_trading_dates(code_id, type):
+    dir = get_kdata_dir(code_id, type)
+    files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+    dates = []
+    for f in files:
+        with open(f) as data_file:
+            items = json.load(data_file)
+            for item in items:
+                dates.append(item['time'])
+    dates.sort()
+    return dates
 
 
 # database info

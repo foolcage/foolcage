@@ -88,11 +88,14 @@ ROBOTSTXT_OBEY = True
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-FILES_STORE = 'data'
+FILES_STORE = '/home/xuanqi/workspace/github/foolcage/fospider/fospider/data'
 SH_STOCK_FILE = 'sh.txt'
 SZ_STOCK_FILE = 'sz.xlsx'
 
-START_TICK_DATE = '2004-10-8'
+AVAILABLE_TICK_DATE = '2004-10-8'
+START_TICK_DATE = '2014-1-1'
+FORCE_DOWNLOAD_KDATA = False
+FORCE_DOWNLOAD_SECURITY_LIST = False
 
 DOWNLOAD_TXT_ENCODING = 'GB2312'
 

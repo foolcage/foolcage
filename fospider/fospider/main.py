@@ -7,5 +7,6 @@ setup_env()
 
 settings = get_project_settings()
 process = CrawlerProcess(settings)
-process.crawl("download_file")
+# process.crawl('download_file')
+process.crawl('download_tick')
 process.start()  # the script will block here until the crawling is finished
