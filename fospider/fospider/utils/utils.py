@@ -59,6 +59,9 @@ def get_sz_security_item(path):
             code = sheet.cell(row=i, column=1).value
             name = sheet.cell(row=i, column=2).value
             list_date = sheet.cell(row=i, column=8).value
+            # ignore just in B
+            if not list_date:
+                continue
             yield SecurityItem(code_id='sz' + code, code=code, name=name, list_date=list_date, exchange='sz',
                                type='stock')
 
@@ -110,6 +113,10 @@ def mkdir_for_security(code_id, type):
 
 def get_kdata_dir(code_id, type):
     return os.path.join(settings.FILES_STORE, type, code_id, 'kdata')
+
+
+def get_kdata_path(code_id, type, year, quarter):
+    return os.path.join(get_kdata_dir(code_id, type), '{}-{}-d.json'.format(year, quarter))
 
 
 def get_tick_dir(code_id, type):

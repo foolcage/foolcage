@@ -1,3 +1,4 @@
+import itertools
 from unittest import TestCase
 
 from fospider.utils.utils import *
@@ -43,3 +44,9 @@ User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/53
         dir = get_tick_dir('sh600000', 'stock')
         for f in os.listdir(dir):
             assert is_available_tick(os.path.join(dir, f))
+
+    def test_stock_list(self):
+        for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
+                                    get_security_item(get_sz_stock_list_path())):
+            print(item)
+            assert item['list_date']

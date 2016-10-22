@@ -41,6 +41,7 @@ Accept-Language:zh-CN,zh;q=0.8,en;q=0.6
 Cache-Control:max-age=0
 Connection:keep-alive
 Host:vip.stock.finance.sina.com.cn
+Referer:vip.stock.finance.sina.com.cn
 Upgrade-Insecure-Requests:1
 User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36
 ''')

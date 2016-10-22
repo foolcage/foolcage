@@ -11,13 +11,11 @@ from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_
     is_available_tick, get_sz_stock_list_path
 
 
-class DownloadTickSpider(scrapy.Spider):
-    name = "download_tick"
+# TODO:add start/end date/stocks setting for download ticks
+class StockTickSpider(scrapy.Spider):
+    name = "stock_tick"
     custom_settings = {
-        'ITEM_PIPELINES': {'fospider.pipelines.GetFilesPipeline': 1},
-        'DEFAULT_REQUEST_HEADERS': DEFAULT_TICK_HEADER}
-    request_infos = {
-    }
+        'ITEM_PIPELINES': {'fospider.pipelines.GetFilesPipeline': 1}}
 
     def start_requests(self):
         for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
@@ -30,25 +28,24 @@ class DownloadTickSpider(scrapy.Spider):
                 if os.path.isfile(path) and is_available_tick(path):
                     continue
 
-                url = self.get_tick_url(trading_date, item['code_id'])
-                self.request_infos[url] = {'path': path}
+                yield Request(url=self.get_tick_url(trading_date, item['code_id']),
+                              meta={'path': path},
+                              headers=DEFAULT_TICK_HEADER, callback=self.download_tick)
 
-                yield Request(url, callback=self.download_file)
-
-    def download_file(self, response):
+    def download_tick(self, response):
         content_type_header = response.headers.get('content-type', None)
 
         if content_type_header.decode("utf-8") == 'application/vnd.ms-excel':
-            path = self.request_infos.get(response.url).get('path')
+            path = response.meta['path']
             with open(path, "wb") as f:
                 f.write(response.body)
         else:
-            self.logger.error("wrong content type:{}".format(content_type_header))
-            self.logger.error("body:{}".format(response.body))
+            self.logger.error("get tick error:url={} content type={} body={}".format(response.url, content_type_header,
+                                                                                     response.body))
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super(DownloadTickSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider = super(StockTickSpider, cls).from_crawler(crawler, *args, **kwargs)
         crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
         return spider
 
