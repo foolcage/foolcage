@@ -8,7 +8,7 @@ from scrapy import signals
 from fospider import settings
 from fospider.consts import DEFAULT_TICK_HEADER
 from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
-    is_available_tick, get_sz_stock_list_path
+    is_available_tick, get_sz_stock_list_path, get_datetime
 
 
 # TODO:add start/end date/stocks setting for download ticks
@@ -21,7 +21,8 @@ class StockTickSpider(scrapy.Spider):
         for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
                                     get_security_item(get_sz_stock_list_path())):
             for trading_date in get_trading_dates(item['code_id'], item['type']):
-                if trading_date < settings.START_TICK_DATE or trading_date < settings.AVAILABLE_TICK_DATE:
+                if get_datetime(trading_date) < get_datetime(settings.START_TICK_DATE) or get_datetime(
+                        trading_date) < get_datetime(settings.AVAILABLE_TICK_DATE):
                     continue
                 path = get_tick_path(item['code_id'], item['type'], trading_date)
 

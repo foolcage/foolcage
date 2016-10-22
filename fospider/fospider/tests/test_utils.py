@@ -50,3 +50,7 @@ User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/53
                                     get_security_item(get_sz_stock_list_path())):
             print(item)
             assert item['list_date']
+
+    def test_get_datetime(self):
+        assert get_datetime('2000-1-1') < get_datetime('2000-09-1')
+        assert get_datetime('2000-1-1') == get_datetime('2000-01-1')
