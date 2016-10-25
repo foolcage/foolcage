@@ -3,10 +3,10 @@ import json
 import os
 
 import openpyxl
-import rethinkdb as r
 
 from fospider import settings
 from fospider.items import SecurityItem
+from fospider.utils.rethinkdb_utils import db_setup
 
 
 def chrome_copy_header_to_dict(src):
@@ -157,54 +157,6 @@ def is_available_tick(path):
             return u'成交时间', u'成交价', u'价格变动', u'成交量(手)', u'成交额(元)', u'性质' == line.split()
     except Exception:
         return False
-
-
-# database info
-RDB_HOST = os.environ.get('RDB_HOST') or 'localhost'
-RDB_PORT = os.environ.get('RDB_PORT') or 28015
-
-FOOLCAGE_DB = 'foolcage'
-
-TABLE_EXCHANGE = 'exchange'
-TABLE_SECURITY_TYPE = 'security_type'
-TABLE_SECURITY = 'security'
-TABLE_TICK = 'tick'
-
-conn = None
-
-
-def create_tables(conn):
-    if not r.table_list().contains(TABLE_EXCHANGE):
-        r.db(FOOLCAGE_DB).table_create(TABLE_EXCHANGE).run(conn)
-    if not r.table_list().contains(TABLE_SECURITY_TYPE):
-        r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY_TYPE).run(conn)
-    if not r.table_list().contains(TABLE_SECURITY):
-        r.db(FOOLCAGE_DB).table_create(TABLE_SECURITY, primary_key='code').run(conn)
-    if not r.table_list().contains(TABLE_TICK):
-        r.db(FOOLCAGE_DB).table_create(TABLE_TICK).run(conn)
-
-
-def db_setup():
-    try:
-        conn = r.connect(host=RDB_HOST, port=RDB_PORT)
-
-        if not r.db_list().contains(FOOLCAGE_DB):
-            r.db_create(FOOLCAGE_DB).run(conn)
-        create_tables(conn)
-    except r.ReqlDriverError or r.ReqlDriverError as error:
-        print(error.message)
-
-
-def db_get_securities():
-    selection = list(r.table(TABLE_SECURITY).run(conn))
-    return json.dumps(selection)
-
-
-def db_insert_security(item):
-    try:
-        r.db(FOOLCAGE_DB).table(TABLE_SECURITY).insert(item, conflict="error").run(conn)
-    except r.RqlRuntimeError as err:
-        print(err.message)
 
 
 # time utils

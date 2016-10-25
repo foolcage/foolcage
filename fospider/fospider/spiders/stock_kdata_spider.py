@@ -72,7 +72,7 @@ class StockKDataSpider(scrapy.Spider):
                 kdata_json.append(dict(item))
                 # yield item
         except Exception as e:
-            self.logger.error('error when gettting k data url={} error={}'.format(response.url, e))
+            self.logger.error('error when getting k data url={} error={}'.format(response.url, e))
 
         try:
             with open(path, "x") as f:

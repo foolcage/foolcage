@@ -45,3 +45,15 @@ Referer:vip.stock.finance.sina.com.cn
 Upgrade-Insecure-Requests:1
 User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36
 ''')
+
+TONGHUASHUN_GN_HEADER = chrome_copy_header_to_dict('''
+Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding:gzip, deflate, sdch
+Accept-Language:zh-CN,zh;q=0.8,en;q=0.6
+Cache-Control:max-age=0
+Connection:keep-alive
+Cookie:Hm_lvt_ab89213e83c551bf095446c08bf64988=1477116434; Hm_lpvt_ab89213e83c551bf095446c08bf64988=1477116434; historystock=600126; spversion=20130314; Hm_lvt_78c58f01938e4d85eaf619eae71b4ed1=1477105757,1477116434; Hm_lpvt_78c58f01938e4d85eaf619eae71b4ed1=1477362626
+Host:q.10jqka.com.cn
+Upgrade-Insecure-Requests:1
+User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36
+''')

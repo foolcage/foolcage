@@ -50,3 +50,15 @@ class KDataItem(scrapy.Item):
     time = scrapy.Field()
     type = scrapy.Field()
     fuquan = scrapy.Field()
+
+
+class SectorItem(scrapy.Item):
+    start_date = scrapy.Field()
+    name = scrapy.Field()
+    link = scrapy.Field()
+    type = scrapy.Field()
+    producer = scrapy.Field()
+    news_title = scrapy.Field()
+    news_link = scrapy.Field()
+    count = scrapy.Field()
+    leadings = scrapy.Field()
