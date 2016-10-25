@@ -24,7 +24,7 @@ class StockGNSpider(scrapy.Spider):
             index_count = response.selector.xpath('//*[@id="m-page"]/span/text()').extract()
             index_count = [x.strip() for x in index_count if x.strip()]
             index, count = [int(x) for x in index_count[0].split('/')]
-            for i in range(index + 1, count):
+            for i in range(index + 1, count + 1):
                 yield Request(url=self.get_gn_url(i), headers=TONGHUASHUN_GN_HEADER,
                               meta={'index': i},
                               callback=self.parse_item)
