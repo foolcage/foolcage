@@ -6,9 +6,10 @@ from twisted.internet import reactor
 from fospider.spiders.stock_gn_spider import StockGNSpider
 from fospider.utils.utils import setup_env
 
+configure_logging()
+
 setup_env()
 
-configure_logging()
 runner = CrawlerRunner()
 
 

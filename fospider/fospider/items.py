@@ -62,3 +62,8 @@ class SectorItem(scrapy.Item):
     news_link = scrapy.Field()
     count = scrapy.Field()
     leadings = scrapy.Field()
+
+
+class StockSectorItem(scrapy.Item):
+    stock_id = scrapy.Field()
+    sector_id = scrapy.Field()
