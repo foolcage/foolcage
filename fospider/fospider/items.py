@@ -53,6 +53,7 @@ class KDataItem(scrapy.Item):
 
 
 class SectorItem(scrapy.Item):
+    id = scrapy.Field()
     start_date = scrapy.Field()
     name = scrapy.Field()
     link = scrapy.Field()

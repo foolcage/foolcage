@@ -40,11 +40,11 @@ class StockGNSpider(scrapy.Spider):
                 news_link = Selector(text=tr).xpath('//td[3]/a/@href').extract()
                 leadings = [x.rsplit('/')[-2] for x in Selector(text=trs[0]).xpath('//td[4]/a/@href').extract()]
                 count = Selector(text=tr).xpath('//td[5]/text()').extract()
-                yield SectorItem(start_date=start_date, name=name, link=link, news_title=news_title,
-                                 news_link=news_link, leadings=leadings, count=count, producer='10jqka', type='gn')
+                yield SectorItem(id='{}_{}_{}'.format('10jqka', 'gn', name), start_date=start_date, name=name,
+                                 link=link, news_title=news_title, news_link=news_link, leadings=leadings, count=count,
+                                 producer='10jqka', type='gn')
         except Exception as e:
-            self.logger.error('error parse 10jqka gainian sector url:{}'.format(response.url, e))
+            self.logger.error('error parse 10jqka gainian sector url:{} {}'.format(response.url, e))
 
     def get_gn_url(self, index):
         return 'http://q.10jqka.com.cn/gn/index/field/addtime/order/desc/page/{}/ajax/1'.format(index)
-
