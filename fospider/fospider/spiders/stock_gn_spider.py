@@ -33,11 +33,11 @@ class StockGNSpider(scrapy.Spider):
 
         try:
             for tr in trs:
-                start_date = Selector(text=tr).xpath('//td[1]/text()').extract()
-                name = Selector(text=tr).xpath('//td[2]/a/text()').extract()
-                link = Selector(text=tr).xpath('//td[2]/a/@href').extract()
-                news_title = Selector(text=tr).xpath('//td[3]/a/text()').extract()
-                news_link = Selector(text=tr).xpath('//td[3]/a/@href').extract()
+                start_date = Selector(text=tr).xpath('//td[1]/text()').extract_first()
+                name = Selector(text=tr).xpath('//td[2]/a/text()').extract_first()
+                link = Selector(text=tr).xpath('//td[2]/a/@href').extract_first()
+                news_title = Selector(text=tr).xpath('//td[3]/a/text()').extract_first()
+                news_link = Selector(text=tr).xpath('//td[3]/a/@href').extract_first()
                 leadings = [x.rsplit('/')[-2] for x in Selector(text=trs[0]).xpath('//td[4]/a/@href').extract()]
                 count = Selector(text=tr).xpath('//td[5]/text()').extract()
                 yield SectorItem(id='{}_{}_{}'.format('10jqka', 'gn', name), start_date=start_date, name=name,

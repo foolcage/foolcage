@@ -60,8 +60,7 @@ def db_insert_sector(item):
 
 
 def db_get_sectors():
-    selection = list(r.db(FOOLCAGE_DB).table(TABLE_SECTOR).run(CONN))
-    return json.dumps(selection)
+    return list(r.db(FOOLCAGE_DB).table(TABLE_SECTOR).run(CONN))
 
 
 def db_clean(table):
