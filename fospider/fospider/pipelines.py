@@ -9,4 +9,5 @@ from fospider.utils.rethinkdb_utils import db_insert_sector
 
 class GetFilesPipeline(object):
     def process_item(self, item, spider):
-        db_insert_sector(item)
+        pass
+        # db_insert_sector(item)

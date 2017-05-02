@@ -4,6 +4,7 @@ from twisted.internet import defer
 from twisted.internet import reactor
 
 from fospider.spiders.stock_gn_spider import StockGNSpider
+from fospider.spiders.stock_kdata_spider import StockKDataSpider
 from fospider.utils.utils import setup_env
 
 configure_logging()
@@ -15,9 +16,9 @@ runner = CrawlerRunner()
 
 @defer.inlineCallbacks
 def crawl():
-    # yield runner.crawl(StockKDataSpider)
+    yield runner.crawl(StockKDataSpider)
     # yield runner.crawl(StockTickSpider)
-    yield runner.crawl(StockGNSpider)
+    # yield runner.crawl(StockGNSpider)
     reactor.stop()
 
 

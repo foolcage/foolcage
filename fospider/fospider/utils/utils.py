@@ -94,7 +94,8 @@ def detect_encoding(url):
 def setup_env():
     if not os.path.exists('data'):
         os.makedirs('data')
-    db_setup()
+    pass
+    # db_setup()
 
 
 def mkdir_for_security(code_id, type):
