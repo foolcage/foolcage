@@ -3,6 +3,7 @@ import json
 import os
 
 import scrapy
+from kafka import KafkaProducer
 from scrapy import Request
 from scrapy import Selector
 from scrapy import signals
@@ -10,6 +11,7 @@ from scrapy import signals
 from fospider import settings
 from fospider.consts import DEFAULT_KDATA_HEADER, DEFAULT_SH_HEADER, DEFAULT_SZ_HEADER
 from fospider.items import KDataItem
+from fospider.settings import KAFKA_HOST
 from fospider.utils.utils import get_security_item, get_quarters, mkdir_for_security, get_year_quarter, \
     get_sh_stock_list_path, get_sz_stock_list_path, get_kdata_path
 
@@ -19,6 +21,7 @@ class StockKDataSpider(scrapy.Spider):
     name = "stock_kdata"
     custom_settings = {
         "ITEM_PIPELINES": {'fospider.pipelines.GetFilesPipeline': 1}}
+    producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
 
     def start_requests(self):
         yield Request(
@@ -38,12 +41,12 @@ class StockKDataSpider(scrapy.Spider):
         with open(path, "wb") as f:
             f.write(response.body)
             for item in get_security_item(path):
-                mkdir_for_security(item['code_id'], item['type'])
+                mkdir_for_security(item['code'], item['type'])
 
                 current_year, current_quarter = get_year_quarter(datetime.date.today())
                 # get day k data
-                for year, quarter in get_quarters(item['list_date']):
-                    data_path = get_kdata_path(item['code_id'], item['type'], year, quarter)
+                for year, quarter in get_quarters(item['listDate']):
+                    data_path = get_kdata_path(item['code'], item['type'], year, quarter)
                     # dont't download again if exist and not current
                     if (current_quarter != quarter or current_year != year) \
                             and os.path.isfile(data_path) and not settings.FORCE_DOWNLOAD_KDATA:
@@ -51,13 +54,14 @@ class StockKDataSpider(scrapy.Spider):
 
                     url = self.get_k_data_url(item['code'], year, quarter)
                     yield Request(url=url, headers=DEFAULT_KDATA_HEADER,
-                                  meta={'path': data_path, 'code_id': item['code_id']},
+                                  meta={'path': data_path, 'code': item['code'], 'exchange': item['exchange']},
                                   callback=self.download_day_k_data)
                     # yield item
 
     def download_day_k_data(self, response):
         path = response.meta['path']
-        code_id = response.meta['code_id']
+        code_id = response.meta['code']
+        security_id = "stock" + "_" + response.meta['exchange'] + "_" + code_id
         trs = response.xpath('//*[@id="FundHoldSharesTable"]/tr[position()>1 and position()<=last()]').extract()
 
         kdata_json = []
@@ -66,10 +70,13 @@ class StockKDataSpider(scrapy.Spider):
             for tr in trs:
                 tds = Selector(text=tr).xpath('//td//text()').extract()
                 tds = [x.strip() for x in tds if x.strip()]
-                item = KDataItem(security_code=code_id, time=tds[0], open=tds[1], high=tds[2], close=tds[3],
-                                 low=tds[4],
-                                 volume=tds[5], turnover=tds[6], fuquan=tds[7], type='stock')
+                item = KDataItem(securityId=security_id, code=code_id, timestamp=tds[0], open=tds[1], high=tds[2],
+                                 close=tds[3], low=tds[4], volume=tds[5], turnover=tds[6], fuquan=tds[7], type='stock',
+                                 level='DAY')
                 kdata_json.append(dict(item))
+                self.producer.send('CHINA_STOCK_KDATA_DAY',
+                                   bytes(json.dumps(dict(item), ensure_ascii=False), encoding='utf8'))
+
                 # yield item
         except Exception as e:
             self.logger.error('error when getting k data url={} error={}'.format(response.url, e))

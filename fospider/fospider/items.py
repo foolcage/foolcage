@@ -39,7 +39,8 @@ class TickItem(scrapy.Item):
 
 
 class KDataItem(scrapy.Item):
-    security_code = scrapy.Field()
+    securityId = scrapy.Field()
+    code = scrapy.Field()
     open = scrapy.Field()
     close = scrapy.Field()
     high = scrapy.Field()
@@ -47,8 +48,9 @@ class KDataItem(scrapy.Item):
     high = scrapy.Field()
     volume = scrapy.Field()
     turnover = scrapy.Field()
-    time = scrapy.Field()
+    timestamp = scrapy.Field()
     type = scrapy.Field()
+    level = scrapy.Field()
     fuquan = scrapy.Field()
 
 

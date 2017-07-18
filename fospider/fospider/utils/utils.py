@@ -6,7 +6,6 @@ import openpyxl
 
 from fospider import settings
 from fospider.items import SecurityItem
-from fospider.utils.rethinkdb_utils import db_setup
 
 
 def chrome_copy_header_to_dict(src):
@@ -50,6 +49,15 @@ def get_tick_item(path):
             yield SecurityItem(code='sh' + code, name=name, list_date=list_date, exchange='sh', type='stock')
 
 
+def generate_csv_line(*items):
+    if items:
+        result = items[0]
+        for item in items[1:]:
+            result = (result + ',' + item)
+        return result
+    return ''
+
+
 def get_sz_security_item(path):
     wb = openpyxl.load_workbook(path)
     for name in wb.get_sheet_names():
@@ -62,8 +70,14 @@ def get_sz_security_item(path):
             # ignore just in B
             if not list_date:
                 continue
-            yield SecurityItem(code_id='sz' + code, code=code, name=name, list_date=list_date, exchange='sz',
-                               type='stock')
+                # yield SecurityItem(code_id='sz' + code, code=code, name=name, list_date=list_date, exchange='sz',
+                #                    type='stock')
+            # yield generate_csv_line(code, name, list_date, 'sz', 'stock')
+            yield {"type": "stock",
+                   "code": code,
+                   "name": name,
+                   "listDate": list_date,
+                   "exchange": "sz"}
 
 
 def get_sh_security_item(path):
@@ -73,8 +87,45 @@ def get_sh_security_item(path):
         lines = fr.readlines()
         for line in lines[1:]:
             code, name, _, _, list_date, _, _ = line.split()
-            yield SecurityItem(code_id='sh' + code, code=code, name=name, list_date=list_date, exchange='sh',
-                               type='stock')
+            # yield SecurityItem(code_id='sh' + code, code=code, name=name, list_date=list_date, exchange='sh',
+            #                    type='stock')
+            # yield generate_csv_line(code, name, list_date, 'sh', 'stock')
+            yield {"type": "stock",
+                   "code": code,
+                   "name": name,
+                   "listDate": list_date,
+                   "exchange": "sh"}
+
+
+def get_tick_item(path, the_date, security_id, code):
+    encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
+        url='file://' + os.path.abspath(path)).get('encoding')
+    with open(path, encoding=encoding) as fr:
+        lines = fr.readlines()
+        for line in lines[1:]:
+            tmp_timestamp, price, tmp_change, volume, turnover, tmp_direction = line.split()
+            # timestamp = datetime.datetime.strptime(the_date + tmp_timestamp, '%Y-%m-%d%H:%M:%S')
+            timestamp = the_date + " " + tmp_timestamp
+            change = 0
+            if not tmp_change == '--':
+                change = float(tmp_change)
+            direction = 0
+            if tmp_direction == '买盘':
+                direction = 1
+            elif tmp_direction == '卖盘':
+                direction = -1
+
+            # yield SecurityItem(code_id='sh' + code, code=code, name=name, list_date=list_date, exchange='sh',
+            #                    type='stock')
+            # yield generate_csv_line(code, name, list_date, 'sh', 'stock')
+            yield {"securityId": security_id,
+                   "code": code,
+                   "timestamp": timestamp,
+                   "price": price,
+                   "change": change,
+                   "direction": direction,
+                   "volume": volume,
+                   "turnover": turnover}
 
 
 def detect_encoding(url):
@@ -144,7 +195,7 @@ def get_trading_dates(code_id, type):
         with open(f) as data_file:
             items = json.load(data_file)
             for item in items:
-                dates.append(item['time'])
+                dates.append(item['date'])
     dates.sort()
     return dates
 
