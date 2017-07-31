@@ -70,14 +70,12 @@ def get_sz_security_item(path):
             # ignore just in B
             if not list_date:
                 continue
-                # yield SecurityItem(code_id='sz' + code, code=code, name=name, list_date=list_date, exchange='sz',
-                #                    type='stock')
-            # yield generate_csv_line(code, name, list_date, 'sz', 'stock')
-            yield {"type": "stock",
-                   "code": code,
-                   "name": name,
-                   "listDate": list_date,
-                   "exchange": "sz"}
+            yield SecurityItem(id=gen_security_id('stock', 'sz', code), type='stock', exchange='sh', code=code,
+                               name=name, listDate=list_date)
+
+
+def gen_security_id(type, exchange, code):
+    return type + '_' + exchange + '_' + code;
 
 
 def get_sh_security_item(path):
@@ -87,14 +85,8 @@ def get_sh_security_item(path):
         lines = fr.readlines()
         for line in lines[1:]:
             code, name, _, _, list_date, _, _ = line.split()
-            # yield SecurityItem(code_id='sh' + code, code=code, name=name, list_date=list_date, exchange='sh',
-            #                    type='stock')
-            # yield generate_csv_line(code, name, list_date, 'sh', 'stock')
-            yield {"type": "stock",
-                   "code": code,
-                   "name": name,
-                   "listDate": list_date,
-                   "exchange": "sh"}
+            yield SecurityItem(id=gen_security_id('stock', 'sh', code), type='stock', exchange='sh', code=code,
+                               name=name, listDate=list_date)
 
 
 def get_tick_item(path, the_date, security_id, code):
@@ -149,8 +141,8 @@ def setup_env():
     # db_setup()
 
 
-def mkdir_for_security(code_id, type):
-    root = os.path.join(settings.FILES_STORE, type, code_id)
+def mkdir_for_security(item):
+    root = os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'])
     if not os.path.exists(root):
         os.makedirs(root)
 
@@ -163,20 +155,23 @@ def mkdir_for_security(code_id, type):
         os.makedirs(tick)
 
 
-def get_kdata_dir(code_id, type):
-    return os.path.join(settings.FILES_STORE, type, code_id, 'kdata')
+def get_kdata_dir(item):
+    return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'], 'kdata')
 
 
-def get_kdata_path(code_id, type, year, quarter):
-    return os.path.join(get_kdata_dir(code_id, type), '{}-{}-d.json'.format(year, quarter))
+def get_kdata_path(item, year, quarter, fuquan):
+    if fuquan:
+        return os.path.join(get_kdata_dir(item), '{}_{}_fuquan_dayk.json'.format(year, quarter))
+    else:
+        return os.path.join(get_kdata_dir(item), '{}_{}_dayk.json'.format(year, quarter))
 
 
-def get_tick_dir(code_id, type):
-    return os.path.join(settings.FILES_STORE, type, code_id, 'tick')
+def get_tick_dir(item):
+    return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'], 'tick')
 
 
-def get_tick_path(code_id, type, date):
-    return os.path.join(get_tick_dir(code_id, type), date + ".xls")
+def get_tick_path(item, date):
+    return os.path.join(get_tick_dir(item), date + ".xls")
 
 
 def get_sh_stock_list_path():
@@ -187,8 +182,8 @@ def get_sz_stock_list_path():
     return os.path.join(settings.FILES_STORE, settings.SZ_STOCK_FILE)
 
 
-def get_trading_dates(code_id, type):
-    dir = get_kdata_dir(code_id, type)
+def get_trading_dates(item):
+    dir = get_kdata_dir(item)
     files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
     dates = []
     for f in files:

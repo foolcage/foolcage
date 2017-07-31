@@ -6,14 +6,16 @@ from scrapy import Request
 from scrapy import signals
 
 from fospider.consts import DEFAULT_SH_HEADER, DEFAULT_SZ_HEADER
-from fospider.settings import KAFKA_HOST
+from fospider.settings import KAFKA_HOST, AUTO_KAFKA
 from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_sz_stock_list_path
 
 
 # TODO:check whether has new stock and new trading date to ignore download again
 class SecurityListSpider(scrapy.Spider):
     name = "stock_list"
-    producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
+
+    if AUTO_KAFKA:
+        producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
 
     def start_requests(self):
         yield Request(
@@ -32,8 +34,9 @@ class SecurityListSpider(scrapy.Spider):
         path = response.meta['path']
         with open(path, "wb") as f:
             f.write(response.body)
-            for item in get_security_item(path):
-                self.producer.send('CHINA_STOCK', bytes(json.dumps(item, ensure_ascii=False), encoding='utf8'))
+            if AUTO_KAFKA:
+                for item in get_security_item(path):
+                    self.producer.send('CHINA_STOCK', bytes(json.dumps(item, ensure_ascii=False), encoding='utf8'))
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):

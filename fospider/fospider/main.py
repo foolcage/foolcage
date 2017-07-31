@@ -3,7 +3,7 @@ from scrapy.utils.log import configure_logging
 from twisted.internet import defer
 from twisted.internet import reactor
 
-from fospider.spiders.stock_tick_spider import StockTickSpider
+from fospider.spiders.stock_kdata_spider import StockKDataSpider
 from fospider.utils.utils import setup_env
 
 configure_logging()
@@ -16,9 +16,9 @@ runner = CrawlerRunner()
 @defer.inlineCallbacks
 def crawl():
     # yield runner.crawl(SecurityListSpider)
-    # yield runner.crawl(StockKDataSpider)
+    yield runner.crawl(StockKDataSpider)
 
-    yield runner.crawl(StockTickSpider)
+    # yield runner.crawl(StockTickSpider)
     # yield runner.crawl(StockGNSpider)
 
     reactor.stop()

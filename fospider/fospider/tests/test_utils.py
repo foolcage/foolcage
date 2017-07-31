@@ -36,12 +36,12 @@ User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/53
         assert set3 == {(2016, 2), (2016, 3), (2016, 4)}
 
     def test_get_trading_dates(self):
-        dates = get_trading_dates('sh600000', 'stock')
+        dates = get_trading_dates(SecurityItem(type='stock', code='600000', exchange='sh'))
         assert dates[0] == '1999-11-10'
         assert dates[-1] == '2016-10-19'
 
     def test_is_available_tick(self):
-        dir = get_tick_dir('sh600000', 'stock')
+        dir = get_tick_dir(SecurityItem(type='stock', code='600000', exchange='sh'))
         for f in os.listdir(dir):
             assert is_available_tick(os.path.join(dir, f))
 

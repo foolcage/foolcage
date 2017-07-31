@@ -9,4 +9,3 @@
 class GetFilesPipeline(object):
     def process_item(self, item, spider):
         pass
-        # db_insert_sector(item)

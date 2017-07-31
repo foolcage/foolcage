@@ -8,26 +8,13 @@
 import scrapy
 
 
-class FileItem(scrapy.Item):
-    path = scrapy.Field()
-
-
-class ExchangeItem(scrapy.Item):
-    name = scrapy.Field()
-    desc = scrapy.Field()
-
-
-class SecurityTypeItem(scrapy.Item):
-    name = scrapy.Field()
-
-
 class SecurityItem(scrapy.Item):
-    code_id = scrapy.Field()
+    id = scrapy.Field()
+    type = scrapy.Field()
+    exchange = scrapy.Field()
     code = scrapy.Field()
     name = scrapy.Field()
-    list_date = scrapy.Field()
-    exchange = scrapy.Field()
-    type = scrapy.Field()
+    listDate = scrapy.Field()
 
 
 class TickItem(scrapy.Item):
@@ -38,8 +25,9 @@ class TickItem(scrapy.Item):
     turnover = scrapy.Field()
 
 
-class KDataItem(scrapy.Item):
+class KDataFuquanItem(scrapy.Item):
     securityId = scrapy.Field()
+    type = scrapy.Field()
     code = scrapy.Field()
     open = scrapy.Field()
     close = scrapy.Field()
@@ -49,9 +37,23 @@ class KDataItem(scrapy.Item):
     volume = scrapy.Field()
     turnover = scrapy.Field()
     timestamp = scrapy.Field()
-    type = scrapy.Field()
     level = scrapy.Field()
     fuquan = scrapy.Field()
+
+
+class KDataItem(scrapy.Item):
+    securityId = scrapy.Field()
+    type = scrapy.Field()
+    code = scrapy.Field()
+    open = scrapy.Field()
+    close = scrapy.Field()
+    high = scrapy.Field()
+    low = scrapy.Field()
+    high = scrapy.Field()
+    volume = scrapy.Field()
+    turnover = scrapy.Field()
+    timestamp = scrapy.Field()
+    level = scrapy.Field()
 
 
 class SectorItem(scrapy.Item):
