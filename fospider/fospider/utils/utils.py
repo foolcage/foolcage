@@ -1,11 +1,14 @@
 import datetime
 import json
+import logging
 import os
 
 import openpyxl
 
 from fospider import settings
 from fospider.items import SecurityItem
+
+logger = logging.getLogger(__name__)
 
 
 def chrome_copy_header_to_dict(src):
@@ -70,7 +73,7 @@ def get_sz_security_item(path):
             # ignore just in B
             if not list_date:
                 continue
-            yield SecurityItem(id=gen_security_id('stock', 'sz', code), type='stock', exchange='sh', code=code,
+            yield SecurityItem(id=gen_security_id('stock', 'sz', code), type='stock', exchange='sz', code=code,
                                name=name, listDate=list_date)
 
 
@@ -89,7 +92,7 @@ def get_sh_security_item(path):
                                name=name, listDate=list_date)
 
 
-def get_tick_item(path, the_date, security_id, code):
+def get_tick_item(path, the_date, security_item):
     encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
         url='file://' + os.path.abspath(path)).get('encoding')
     with open(path, encoding=encoding) as fr:
@@ -110,8 +113,8 @@ def get_tick_item(path, the_date, security_id, code):
             # yield SecurityItem(code_id='sh' + code, code=code, name=name, list_date=list_date, exchange='sh',
             #                    type='stock')
             # yield generate_csv_line(code, name, list_date, 'sh', 'stock')
-            yield {"securityId": security_id,
-                   "code": code,
+            yield {"securityId": security_item['id'],
+                   "code": security_item['code'],
                    "timestamp": timestamp,
                    "price": price,
                    "change": change,
@@ -142,28 +145,32 @@ def setup_env():
 
 
 def mkdir_for_security(item):
-    root = os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'])
-    if not os.path.exists(root):
-        os.makedirs(root)
+    fuquan_kdata_dir = get_fuquan_kdata_dir(item)
+    if not os.path.exists(fuquan_kdata_dir):
+        os.makedirs(fuquan_kdata_dir)
 
-    kdata = os.path.join(root, 'kdata')
-    if not os.path.exists(kdata):
-        os.makedirs(kdata)
 
-    tick = os.path.join(root, 'tick')
-    if not os.path.exists(tick):
-        os.makedirs(tick)
+def get_security_dir(item):
+    return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'])
 
 
 def get_kdata_dir(item):
-    return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'], 'kdata')
+    return os.path.join(get_security_dir(item), 'kdata')
+
+
+def get_fuquan_kdata_dir(item):
+    return os.path.join(get_kdata_dir(item), 'fuquan')
 
 
 def get_kdata_path(item, year, quarter, fuquan):
     if fuquan:
-        return os.path.join(get_kdata_dir(item), '{}_{}_fuquan_dayk.json'.format(year, quarter))
+        return os.path.join(get_fuquan_kdata_dir(item), '{}_{}_fuquan_dayk.json'.format(year, quarter))
     else:
         return os.path.join(get_kdata_dir(item), '{}_{}_dayk.json'.format(year, quarter))
+
+
+def get_trading_dates_path(item):
+    return os.path.join(get_security_dir(item), 'trading_dates.json')
 
 
 def get_tick_dir(item):
@@ -183,14 +190,23 @@ def get_sz_stock_list_path():
 
 
 def get_trading_dates(item):
-    dir = get_kdata_dir(item)
-    files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
     dates = []
-    for f in files:
-        with open(f) as data_file:
-            items = json.load(data_file)
-            for item in items:
-                dates.append(item['date'])
+    dates_path = get_trading_dates_path(item)
+    try:
+        with open(dates_path) as data_file:
+            dates = json.load(data_file)
+    except Exception as e:
+        logger.info(e)
+
+    if not dates:
+        dir = get_kdata_dir(item)
+        files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+
+        for f in files:
+            with open(f) as data_file:
+                items = json.load(data_file)
+                for item in items:
+                    dates.append(item['date'])
     dates.sort()
     return dates
 

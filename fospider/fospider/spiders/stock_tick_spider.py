@@ -9,7 +9,7 @@ from scrapy import signals
 
 from fospider import settings
 from fospider.consts import DEFAULT_TICK_HEADER
-from fospider.settings import KAFKA_HOST
+from fospider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
 from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
     is_available_tick, get_sz_stock_list_path, get_datetime, get_tick_item
 
@@ -17,29 +17,28 @@ from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_
 # TODO:add start/end date/stocks setting for download ticks
 class StockTickSpider(scrapy.Spider):
     name = "stock_tick"
-    custom_settings = {
-        'ITEM_PIPELINES': {'fospider.pipelines.GetFilesPipeline': 1}}
-    producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
+    if AUTO_KAFKA:
+        producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
 
     def start_requests(self):
         for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
                                     get_security_item(get_sz_stock_list_path())):
-            for trading_date in get_trading_dates(item):
-                if get_datetime(trading_date) < get_datetime(settings.START_TICK_DATE) or get_datetime(
-                        trading_date) < get_datetime(settings.AVAILABLE_TICK_DATE):
-                    continue
-                path = get_tick_path(item['code'], item['type'], trading_date)
+            if item['code'] >= STOCK_START_CODE and item['code'] <= STOCK_END_CODE:
+                for trading_date in get_trading_dates(item):
+                    if get_datetime(trading_date) < get_datetime(settings.START_TICK_DATE) or get_datetime(
+                            trading_date) < get_datetime(settings.AVAILABLE_TICK_DATE):
+                        continue
+                    path = get_tick_path(item, trading_date)
 
-                if os.path.isfile(path) and is_available_tick(path):
-                    continue
+                    if os.path.isfile(path) and is_available_tick(path):
+                        continue
 
-                yield Request(url=self.get_tick_url(trading_date, item['exchange'] + item['code']),
-                              meta={'path': path,
-                                    'trading_date': trading_date,
-                                    'security_id': item['type'] + "_" + item['exchange'] + "_" + item['code'],
-                                    'code': item['code']},
-
-                              headers=DEFAULT_TICK_HEADER, callback=self.download_tick)
+                    yield Request(url=self.get_tick_url(trading_date, item['exchange'] + item['code']),
+                                  meta={'path': path,
+                                        'trading_date': trading_date,
+                                        'item': item},
+                                  headers=DEFAULT_TICK_HEADER,
+                                  callback=self.download_tick)
 
     def download_tick(self, response):
         content_type_header = response.headers.get('content-type', None)
@@ -47,13 +46,14 @@ class StockTickSpider(scrapy.Spider):
         if content_type_header.decode("utf-8") == 'application/vnd.ms-excel':
             path = response.meta['path']
             trading_date = response.meta['trading_date']
-            security_id = response.meta['security_id']
-            code = response.meta['code']
+            item = response.meta['item']
             with open(path, "wb") as f:
                 f.write(response.body)
                 f.flush()
-                for item in get_tick_item(path, trading_date, security_id, code):
-                    self.producer.send('CHINA_STOCK_TICK', bytes(json.dumps(item, ensure_ascii=False), encoding='utf8'))
+                if AUTO_KAFKA:
+                    for tick_item in get_tick_item(path, trading_date, item):
+                        self.producer.send('CHINA_STOCK_TICK',
+                                           bytes(json.dumps(tick_item, ensure_ascii=False), encoding='utf8'))
 
         else:
             self.logger.error(
