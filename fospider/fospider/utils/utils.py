@@ -11,6 +11,26 @@ from fospider.items import SecurityItem
 logger = logging.getLogger(__name__)
 
 
+def init_log():
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+
+    fh = logging.FileHandler('foolcage.log')
+    fh.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter("%(levelname) -10s %(asctime)s %(module)s:%(lineno)s %(funcName)s %(message)s")
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    # add the handlers to the logger
+    root_logger.addHandler(fh)
+    root_logger.addHandler(ch)
+
+
 def chrome_copy_header_to_dict(src):
     lines = src.split('\n')
     header = {}
@@ -40,16 +60,6 @@ def get_security_item(path):
         return get_sh_security_item(path)
     elif is_sz_stock_file(path):
         return get_sz_security_item(path)
-
-
-def get_tick_item(path):
-    encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
-        url='file://' + os.path.abspath(path)).get('encoding')
-    with open(path, encoding=encoding) as fr:
-        lines = fr.readlines()
-        for line in lines[1:]:
-            code, name, _, _, list_date, _, _ = line.split()
-            yield SecurityItem(code='sh' + code, name=name, list_date=list_date, exchange='sh', type='stock')
 
 
 def generate_csv_line(*items):
@@ -173,22 +183,6 @@ def get_trading_dates_path(item):
     return os.path.join(get_security_dir(item), 'trading_dates.json')
 
 
-def get_tick_dir(item):
-    return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'], 'tick')
-
-
-def get_tick_path(item, date):
-    return os.path.join(get_tick_dir(item), date + ".xls")
-
-
-def get_sh_stock_list_path():
-    return os.path.join(settings.FILES_STORE, settings.SH_STOCK_FILE)
-
-
-def get_sz_stock_list_path():
-    return os.path.join(settings.FILES_STORE, settings.SZ_STOCK_FILE)
-
-
 def get_trading_dates(item):
     dates = []
     dates_path = get_trading_dates_path(item)
@@ -209,6 +203,22 @@ def get_trading_dates(item):
                     dates.append(item['date'])
     dates.sort()
     return dates
+
+
+def get_tick_dir(item):
+    return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'], 'tick')
+
+
+def get_tick_path(item, date):
+    return os.path.join(get_tick_dir(item), date + ".xls")
+
+
+def get_sh_stock_list_path():
+    return os.path.join(settings.FILES_STORE, settings.SH_STOCK_FILE)
+
+
+def get_sz_stock_list_path():
+    return os.path.join(settings.FILES_STORE, settings.SZ_STOCK_FILE)
 
 
 def is_available_tick(path):

@@ -23,7 +23,7 @@ class StockTickSpider(scrapy.Spider):
     def start_requests(self):
         for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
                                     get_security_item(get_sz_stock_list_path())):
-            if item['code'] >= STOCK_START_CODE and item['code'] <= STOCK_END_CODE:
+            if STOCK_START_CODE <= item['code'] <= STOCK_END_CODE:
                 for trading_date in get_trading_dates(item):
                     if get_datetime(trading_date) < get_datetime(settings.START_TICK_DATE) or get_datetime(
                             trading_date) < get_datetime(settings.AVAILABLE_TICK_DATE):

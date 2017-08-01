@@ -13,7 +13,7 @@ from fospider.consts import DEFAULT_KDATA_HEADER
 from fospider.items import KDataFuquanItem, KDataItem
 from fospider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
 from fospider.utils.utils import get_security_item, get_quarters, mkdir_for_security, get_year_quarter, \
-    get_sh_stock_list_path, get_sz_stock_list_path, get_kdata_path, get_trading_dates_path
+    get_sh_stock_list_path, get_sz_stock_list_path, get_kdata_path, get_trading_dates_path, get_trading_dates
 
 
 class StockKDataSpider(scrapy.Spider):
@@ -26,7 +26,7 @@ class StockKDataSpider(scrapy.Spider):
         for stock_file in stock_files:
             for item in get_security_item(stock_file):
                 # 设置抓取的股票范围
-                if item['code'] >= STOCK_START_CODE and item['code'] <= STOCK_END_CODE:
+                if STOCK_START_CODE <= item['code'] <= STOCK_END_CODE:
                     mkdir_for_security(item)
 
                     current_year, current_quarter = get_year_quarter(datetime.date.today())
@@ -83,6 +83,9 @@ class StockKDataSpider(scrapy.Spider):
                 self.logger.error('error when saving k data url={} path={} error={}'.format(response.url, path, e))
         if len(trading_dates) > 0:
             path = get_trading_dates_path(item)
+            current_dates = get_trading_dates(item)
+            trading_dates = list(set(current_dates + trading_dates))
+            trading_dates.sort()
             try:
                 with open(get_trading_dates_path(item), "w") as f:
                     json.dump(trading_dates, f)
