@@ -62,7 +62,7 @@ class StockTickSpider(scrapy.Spider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super(StockTickSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider = super(DownloadSheetSpider, cls).from_crawler(crawler, *args, **kwargs)
         crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
         return spider
 

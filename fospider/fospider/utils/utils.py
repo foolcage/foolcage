@@ -159,6 +159,10 @@ def mkdir_for_security(item):
     if not os.path.exists(fuquan_kdata_dir):
         os.makedirs(fuquan_kdata_dir)
 
+    finance_dir = get_finance_dir(item)
+    if not os.path.exists(finance_dir):
+        os.makedirs(finance_dir)
+
 
 def get_security_dir(item):
     return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'])
@@ -211,6 +215,22 @@ def get_tick_dir(item):
 
 def get_tick_path(item, date):
     return os.path.join(get_tick_dir(item), date + ".xls")
+
+
+def get_finance_dir(item):
+    return os.path.join(get_security_dir(item), "finance")
+
+
+def get_balance_sheet_path(item):
+    return os.path.join(get_finance_dir(item), "balance_sheet.xls")
+
+
+def get_income_statement_path(item):
+    return os.path.join(get_finance_dir(item), "income_statement.xls")
+
+
+def get_cash_flow_statement_path(item):
+    return os.path.join(get_finance_dir(item), "cash_flow_statement.xls")
 
 
 def get_sh_stock_list_path():
