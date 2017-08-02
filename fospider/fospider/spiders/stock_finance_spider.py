@@ -55,7 +55,7 @@ class StockFinanceSpider(scrapy.Spider):
         return spider
 
     def spider_closed(self, spider, reason):
-        spider.logger.info('Spider closed: %s,%s', spider.name, reason)
+        spider.logger.info('Spider closed: %s,%s\n', spider.name, reason)
 
     def get_balance_sheet_url(self, code):
         return 'http://money.finance.sina.com.cn/corp/go.php/vDOWN_BalanceSheet/displaytype/4/stockid/{}/ctrl/all.phtml' \

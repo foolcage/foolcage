@@ -194,7 +194,7 @@ def get_trading_dates(item):
         with open(dates_path) as data_file:
             dates = json.load(data_file)
     except Exception as e:
-        logger.info(e)
+        pass
 
     if not dates:
         dir = get_kdata_dir(item)
@@ -204,7 +204,7 @@ def get_trading_dates(item):
             with open(f) as data_file:
                 items = json.load(data_file)
                 for item in items:
-                    dates.append(item['date'])
+                    dates.append(item['timestamp'])
     dates.sort()
     return dates
 

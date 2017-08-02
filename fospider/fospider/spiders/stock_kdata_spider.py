@@ -100,7 +100,7 @@ class StockKDataSpider(scrapy.Spider):
         return spider
 
     def spider_closed(self, spider, reason):
-        spider.logger.info('Spider closed: %s,%s', spider.name, reason)
+        spider.logger.info('Spider closed: %s,%s\n', spider.name, reason)
 
     def get_k_data_url(self, code, year, quarter, fuquan):
         if fuquan:

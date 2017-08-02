@@ -62,12 +62,12 @@ class StockTickSpider(scrapy.Spider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super(DownloadSheetSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider = super(StockTickSpider, cls).from_crawler(crawler, *args, **kwargs)
         crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
         return spider
 
     def spider_closed(self, spider, reason):
-        spider.logger.info('Spider closed: %s,%s', spider.name, reason)
+        spider.logger.info('Spider closed: %s,%s\n', spider.name, reason)
 
     def get_tick_url(self, date, code):
         return 'http://market.finance.sina.com.cn/downxls.php?date={}&symbol={}'.format(date, code)
