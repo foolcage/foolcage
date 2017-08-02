@@ -11,7 +11,7 @@ from fospider import settings
 from fospider.consts import DEFAULT_TICK_HEADER
 from fospider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
 from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
-    is_available_tick, get_sz_stock_list_path, get_datetime, get_tick_item
+    is_available_tick, get_sz_stock_list_path, get_datetime, get_tick_item, mkdir_for_security
 
 
 # TODO:add start/end date/stocks setting for download ticks
@@ -24,6 +24,7 @@ class StockTickSpider(scrapy.Spider):
         for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
                                     get_security_item(get_sz_stock_list_path())):
             if STOCK_START_CODE <= item['code'] <= STOCK_END_CODE:
+                mkdir_for_security(item)
                 for trading_date in get_trading_dates(item):
                     if get_datetime(trading_date) < get_datetime(settings.START_TICK_DATE) or get_datetime(
                             trading_date) < get_datetime(settings.AVAILABLE_TICK_DATE):

@@ -163,6 +163,10 @@ def mkdir_for_security(item):
     if not os.path.exists(finance_dir):
         os.makedirs(finance_dir)
 
+    tick_dir = get_tick_dir(item)
+    if not os.path.exists(tick_dir):
+        os.makedirs(tick_dir)
+
 
 def get_security_dir(item):
     return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'])
