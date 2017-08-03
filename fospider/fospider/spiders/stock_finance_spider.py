@@ -13,6 +13,12 @@ from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_
 
 class StockFinanceSpider(scrapy.Spider):
     name = "stock_finance"
+
+    custom_settings = {
+        'DOWNLOAD_DELAY': 5,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 2
+    }
+
     if AUTO_KAFKA:
         producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
 
