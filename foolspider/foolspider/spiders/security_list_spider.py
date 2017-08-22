@@ -5,9 +5,9 @@ from kafka import KafkaProducer
 from scrapy import Request
 from scrapy import signals
 
-from fospider.consts import DEFAULT_SH_HEADER, DEFAULT_SZ_HEADER
-from fospider.settings import KAFKA_HOST, AUTO_KAFKA
-from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_sz_stock_list_path
+from foolspider.consts import DEFAULT_SH_HEADER, DEFAULT_SZ_HEADER
+from foolspider.settings import KAFKA_HOST, AUTO_KAFKA
+from foolspider.utils.utils import get_security_item, get_sh_stock_list_path, get_sz_stock_list_path
 
 
 # TODO:check whether has new stock and new trading date to ignore download again

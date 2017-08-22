@@ -3,11 +3,11 @@ from scrapy.utils.log import configure_logging
 from twisted.internet import defer
 from twisted.internet import reactor
 
-from fospider.spiders.security_list_spider import SecurityListSpider
-from fospider.spiders.stock_finance_spider import StockFinanceSpider
-from fospider.spiders.stock_kdata_spider import StockKDataSpider
-from fospider.spiders.stock_tick_spider import StockTickSpider
-from fospider.utils.utils import setup_env
+from foolspider.spiders.security_list_spider import SecurityListSpider
+from foolspider.spiders.stock_finance_spider import StockFinanceSpider
+from foolspider.spiders.stock_kdata_spider import StockKDataSpider
+from foolspider.spiders.stock_tick_spider import StockTickSpider
+from foolspider.utils.utils import setup_env
 
 configure_logging()
 

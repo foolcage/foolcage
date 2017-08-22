@@ -5,9 +5,9 @@ from kafka import KafkaProducer
 from scrapy import Request
 from scrapy import signals
 
-from fospider.consts import DEFAULT_BALANCE_SHEET_HEADER
-from fospider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
-from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_sz_stock_list_path, \
+from foolspider.consts import DEFAULT_BALANCE_SHEET_HEADER
+from foolspider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
+from foolspider.utils.utils import get_security_item, get_sh_stock_list_path, get_sz_stock_list_path, \
     get_balance_sheet_path, get_income_statement_path, get_cash_flow_statement_path, mkdir_for_security
 
 

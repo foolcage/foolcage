@@ -1,12 +1,13 @@
 import datetime
+import itertools
 import json
 import logging
 import os
 
 import openpyxl
 
-from fospider import settings
-from fospider.items import SecurityItem
+from foolspider import settings
+from foolspider.items import SecurityItem
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,13 @@ def is_sh_stock_file(path):
 
 def is_sz_stock_file(path):
     return path.endswith(settings.SZ_STOCK_FILE)
+
+
+def get_security_items(start='000001', end='666666'):
+    for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
+                                get_security_item(get_sz_stock_list_path())):
+        if start <= item['code'] < end:
+            yield item
 
 
 def get_security_item(path):
@@ -102,12 +110,31 @@ def get_sh_security_item(path):
                                name=name, listDate=list_date)
 
 
+def get_tick_items(security_item):
+    for trading_date in get_trading_dates(security_item):
+        tick_path = get_tick_path(security_item, trading_date)
+        if os.path.exists(tick_path):
+            yield get_tick_item(tick_path, trading_date, security_item)
+
+
+def get_kdata_items(security_item):
+    dir = get_kdata_dir(security_item)
+    if os.path.exists(dir):
+        files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+
+        for f in sorted(files):
+            with open(f) as data_file:
+                kdata_jsons = json.load(data_file)
+                for kdata_json in reversed(kdata_jsons):
+                    yield kdata_json
+
+
 def get_tick_item(path, the_date, security_item):
     encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
         url='file://' + os.path.abspath(path)).get('encoding')
     with open(path, encoding=encoding) as fr:
         lines = fr.readlines()
-        for line in lines[1:]:
+        for line in reversed(lines[1:]):
             tmp_timestamp, price, tmp_change, volume, turnover, tmp_direction = line.split()
             # timestamp = datetime.datetime.strptime(the_date + tmp_timestamp, '%Y-%m-%d%H:%M:%S')
             timestamp = the_date + " " + tmp_timestamp
@@ -202,13 +229,14 @@ def get_trading_dates(item):
 
     if not dates:
         dir = get_kdata_dir(item)
-        files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+        if os.path.exists(dir):
+            files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
 
-        for f in files:
-            with open(f) as data_file:
-                items = json.load(data_file)
-                for item in items:
-                    dates.append(item['timestamp'])
+            for f in files:
+                with open(f) as data_file:
+                    items = json.load(data_file)
+                    for item in items:
+                        dates.append(item['timestamp'])
     dates.sort()
     return dates
 

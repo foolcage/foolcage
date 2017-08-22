@@ -9,10 +9,10 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'fospider'
+BOT_NAME = 'foolspider'
 
-SPIDER_MODULES = ['fospider.spiders']
-NEWSPIDER_MODULE = 'fospider.spiders'
+SPIDER_MODULES = ['foolspider.spiders']
+NEWSPIDER_MODULE = 'foolspider.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'fospider (+http://www.yourdomain.com)'
@@ -93,7 +93,7 @@ SH_STOCK_FILE = 'sh.txt'
 SZ_STOCK_FILE = 'sz.xlsx'
 
 STOCK_START_CODE = '000001'
-STOCK_END_CODE = '999999'
+STOCK_END_CODE = '000002'
 
 AVAILABLE_TICK_DATE = '2004-10-8'
 START_TICK_DATE = '2013-1-1'

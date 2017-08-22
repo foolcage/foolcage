@@ -2,11 +2,12 @@ import json
 import logging
 import os
 
-from fospider.settings import STOCK_START_CODE, STOCK_END_CODE
-from fospider.utils.utils import get_sh_stock_list_path, get_sz_stock_list_path, get_security_item, get_kdata_dir, \
+from foolspider.settings import STOCK_START_CODE, STOCK_END_CODE
+from foolspider.utils.utils import get_sh_stock_list_path, get_sz_stock_list_path, get_security_item, get_kdata_dir, \
     get_trading_dates_path
 
 logger = logging.getLogger(__name__)
+
 
 # 抓取k线时会自动生成交易日期json，如果出错，可以用该脚本手动生成
 def init_trading_dates():

@@ -7,10 +7,10 @@ from kafka import KafkaProducer
 from scrapy import Request
 from scrapy import signals
 
-from fospider import settings
-from fospider.consts import DEFAULT_TICK_HEADER
-from fospider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
-from fospider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
+from foolspider import settings
+from foolspider.consts import DEFAULT_TICK_HEADER
+from foolspider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
+from foolspider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
     is_available_tick, get_sz_stock_list_path, get_datetime, get_tick_item, mkdir_for_security
 
 

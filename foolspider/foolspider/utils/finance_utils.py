@@ -1,9 +1,9 @@
 import logging
 import os
 
-from fospider import settings
-from fospider.items import SecurityItem
-from fospider.utils.utils import get_balance_sheet_path, detect_encoding, get_income_statement_path, \
+from foolspider import settings
+from foolspider.items import SecurityItem
+from foolspider.utils.utils import get_balance_sheet_path, detect_encoding, get_income_statement_path, \
     get_cash_flow_statement_path
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 import itertools
 from unittest import TestCase
 
-from fospider.utils.utils import *
+from foolspider.utils.utils import *
 
 
 class TestUtils(TestCase):

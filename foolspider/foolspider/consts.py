@@ -1,4 +1,4 @@
-from fospider.utils.utils import chrome_copy_header_to_dict
+from foolspider.utils.utils import chrome_copy_header_to_dict
 
 DEFAULT_SH_HEADER = chrome_copy_header_to_dict('''
 Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8

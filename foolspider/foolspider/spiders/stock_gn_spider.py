@@ -2,14 +2,14 @@ import scrapy
 from scrapy import Request
 from scrapy.selector.unified import Selector
 
-from fospider.consts import TONGHUASHUN_GN_HEADER
-from fospider.items import SectorItem
+from foolspider.consts import TONGHUASHUN_GN_HEADER
+from foolspider.items import SectorItem
 
 
 class StockGNSpider(scrapy.Spider):
     name = "stock_gn_spider"
     custom_settings = {
-        "ITEM_PIPELINES": {'fospider.pipelines.GetFilesPipeline': 1}}
+        "ITEM_PIPELINES": {'foolspider.pipelines.GetFilesPipeline': 1}}
 
     def start_requests(self):
         yield Request(

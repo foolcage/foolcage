@@ -8,11 +8,11 @@ from scrapy import Request
 from scrapy import Selector
 from scrapy import signals
 
-from fospider import settings
-from fospider.consts import DEFAULT_KDATA_HEADER
-from fospider.items import KDataFuquanItem, KDataItem
-from fospider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
-from fospider.utils.utils import get_security_item, get_quarters, mkdir_for_security, get_year_quarter, \
+from foolspider import settings
+from foolspider.consts import DEFAULT_KDATA_HEADER
+from foolspider.items import KDataFuquanItem, KDataItem
+from foolspider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
+from foolspider.utils.utils import get_security_item, get_quarters, mkdir_for_security, get_year_quarter, \
     get_sh_stock_list_path, get_sz_stock_list_path, get_kdata_path, get_trading_dates_path, get_trading_dates
 
 
