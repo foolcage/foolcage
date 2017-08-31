@@ -1,5 +1,4 @@
 from elasticsearch_dsl import DocType, Keyword, Date, Float
-from elasticsearch_dsl import Index
 from elasticsearch_dsl import MetaField
 
 
@@ -16,8 +15,9 @@ class BaseKData(DocType):
     turnover = Float()
     timestamp = Date()
     level = Keyword()
+    fuquan = Float()
 
 
-class DayKdata(BaseKData):
+class KdataDay(BaseKData):
     class Meta:
         all = MetaField(enabled=False)

@@ -309,3 +309,8 @@ def get_quarters(start):
                [(current_year_quarter[0], x) for x in range(1, current_year_quarter[1] + 1)]
     else:
         raise Exception("wrong start time:{}".format(start));
+
+
+def fill_doc_type(doc_type, json_object):
+    for key in json_object:
+        doc_type[key] = json_object[key]

@@ -9,16 +9,18 @@ from foolspider.utils.utils import get_balance_sheet_path, detect_encoding, get_
 logger = logging.getLogger(__name__)
 
 
-def get_balance_sheet_item(security_item):
+def get_balance_sheet_items(security_item):
     path = get_balance_sheet_path(security_item)
+    if not os.path.exists(path):
+        return None
     encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
         url='file://' + os.path.abspath(path)).get('encoding')
 
     with open(path, encoding=encoding) as fr:
         lines = fr.readlines()
 
-        for idx, line in enumerate(lines):
-            yield idx, line.split()
+        # for idx, line in enumerate(lines):
+        #     yield idx, line.split()
 
         reportDate = lines[0].split()[1:-1]
         # 货币资金
@@ -378,15 +380,17 @@ def get_balance_sheet_item(security_item):
             }
 
 
-def get_income_statement_item(security_item):
+def get_income_statement_items(security_item):
     path = get_income_statement_path(security_item)
+    if not os.path.exists(path):
+        return None
     encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
         url='file://' + os.path.abspath(path)).get('encoding')
 
     with open(path, encoding=encoding) as fr:
         lines = fr.readlines()
-        for idx, line in enumerate(lines):
-            yield idx, line.split()
+        # for idx, line in enumerate(lines):
+        #     yield idx, line.split()
 
         reportDate = lines[0].split()[1:-1]
         # /*营业总收入*/
@@ -510,15 +514,17 @@ def get_income_statement_item(security_item):
         }
 
 
-def get_cash_flow_statement_item(security_item):
+def get_cash_flow_statement_items(security_item):
     path = get_cash_flow_statement_path(security_item)
+    if not os.path.exists(path):
+        return None
     encoding = settings.DOWNLOAD_TXT_ENCODING if settings.DOWNLOAD_TXT_ENCODING else detect_encoding(
         url='file://' + os.path.abspath(path)).get('encoding')
 
     with open(path, encoding=encoding) as fr:
         lines = fr.readlines()
-        for idx, line in enumerate(lines):
-            yield idx, line.split()
+        # for idx, line in enumerate(lines):
+        #     yield idx, line.split()
         reportDate = lines[0].split()[1:-1]
         # /*一、经营活动产生的现金流量*/
         # 销售商品、提供劳务收到的现金
@@ -824,6 +830,6 @@ def get_cash_flow_statement_item(security_item):
 
 
 if __name__ == '__main__':
-    for item in get_cash_flow_statement_item(
+    for item in get_cash_flow_statement_items(
             SecurityItem(type='stock', code='000004', exchange='sz', id='stock_sz_000004')):
         print(item)
