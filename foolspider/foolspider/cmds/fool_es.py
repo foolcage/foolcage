@@ -4,7 +4,7 @@ from elasticsearch_dsl import Index
 
 from foolspider.domain.finance import BalanceSheet, IncomeStatement, CashFlowStatement
 from foolspider.domain.meta import StockMeta
-from foolspider.domain.technical import KdataDay
+from foolspider.domain.technical import KdataDay, KdataDayHoufuquan
 from foolspider.utils.finance_utils import get_balance_sheet_items, get_income_statement_items, \
     get_cash_flow_statement_items
 from foolspider.utils.utils import get_security_items, get_kdata_items, fill_doc_type
@@ -28,19 +28,37 @@ def kdata_to_es():
         # 创建索引
         index = Index(security_item['id'] + "_technical")
         index.doc_type(KdataDay)
-        index.create()
+        if not index.exists():
+            index.create()
+        else:
+            index.upgrade()
         for kdata_json in get_kdata_items(security_item):
             try:
                 kdata_item = KdataDay(
-                    meta={'id': '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])},
-                    securityId=kdata_json['securityId'], type=kdata_json['type'],
-                    code=kdata_json['code'],
-                    open=kdata_json['open'], close=kdata_json['close'], high=kdata_json['high'],
-                    low=kdata_json['low'], volume=kdata_json['volume'], turnover=kdata_json['turnover'],
-                    timestamp=kdata_json['timestamp'], level=kdata_json['level'])
+                    meta={'id': '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])})
+                fill_doc_type(kdata_item, kdata_json)
                 kdata_item.save()
             except Exception as e:
-                logger.warn("wrong DayKdata:{},error:{}", kdata_item, e)
+                logger.warn("wrong KdataDay:{},error:{}", kdata_item, e)
+
+
+def kdata_houfuquan_to_es():
+    for security_item in get_security_items():
+        # 创建索引
+        index = Index(security_item['id'] + "_technical")
+        index.doc_type(KdataDayHoufuquan)
+        if not index.exists():
+            index.create()
+        else:
+            index.upgrade()
+        for kdata_json in get_kdata_items(security_item, houfuquan=True):
+            try:
+                kdata_item = KdataDayHoufuquan(
+                    meta={'id': '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])})
+                fill_doc_type(kdata_item, kdata_json)
+                kdata_item.save()
+            except Exception as e:
+                logger.warn("wrong KdataDayHoufuquan:{},error:{}", kdata_item, e)
 
 
 def balance_sheet_to_es():
@@ -83,6 +101,7 @@ if __name__ == '__main__':
     from elasticsearch_dsl.connections import connections
 
     connections.create_connection(hosts=['localhost'], timeout=20)
-    balance_sheet_to_es()
-    income_statement_to_es()
-    cash_flow_statement_to_es()
+    # balance_sheet_to_es()
+    # income_statement_to_es()
+    # cash_flow_statement_to_es()
+    kdata_houfuquan_to_es()

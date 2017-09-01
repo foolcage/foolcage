@@ -21,3 +21,8 @@ class BaseKData(DocType):
 class KdataDay(BaseKData):
     class Meta:
         all = MetaField(enabled=False)
+
+
+class KdataDayHoufuquan(BaseKData):
+    class Meta:
+        all = MetaField(enabled=False)

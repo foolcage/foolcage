@@ -117,8 +117,11 @@ def get_tick_items(security_item):
             yield get_tick_item(tick_path, trading_date, security_item)
 
 
-def get_kdata_items(security_item):
-    dir = get_kdata_dir(security_item)
+def get_kdata_items(security_item, houfuquan=False):
+    if houfuquan:
+        dir = get_fuquan_kdata_dir(security_item)
+    else:
+        dir = get_kdata_dir(security_item)
     if os.path.exists(dir):
         files = [os.path.join(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
 
