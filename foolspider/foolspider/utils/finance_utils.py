@@ -200,6 +200,7 @@ def get_balance_sheet_items(security_item):
 
         for idx, _ in enumerate(reportDate):
             yield {
+                "id": '{}_{}'.format(security_item["id"], reportDate[idx]),
                 "reportDate": reportDate[idx],
                 "securityId": security_item["id"],
                 "code": security_item["code"],
@@ -451,6 +452,7 @@ def get_income_statement_items(security_item):
         attributableToMinorityShareholders = lines[30].split()[1:-1]
     for idx, _ in enumerate(reportDate):
         yield {
+            "id": '{}_{}'.format(security_item["id"], reportDate[idx]),
             "reportDate": reportDate[idx],
             "securityId": security_item["id"],
             "code": security_item["code"],
@@ -674,6 +676,7 @@ def get_cash_flow_statement_items(security_item):
         netIncreaseInCashAndCashEquivalents = lines[76].split()[1:-1]
     for idx, _ in enumerate(reportDate):
         yield {
+            "id": '{}_{}'.format(security_item["id"], reportDate[idx]),
             "reportDate": reportDate[idx],
             "securityId": security_item["id"],
             "code": security_item["code"],

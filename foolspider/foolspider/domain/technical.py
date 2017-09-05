@@ -4,18 +4,20 @@ from elasticsearch_dsl import MetaField
 
 # 不复权
 class BaseKData(DocType):
+    id = Keyword()
     securityId = Keyword()
+    timestamp = Date()
     type = Keyword()
     code = Keyword()
+    level = Keyword()
+    fuquan = Float()
+
     open = Float()
     close = Float()
     high = Float()
     low = Float()
     volume = Float()
     turnover = Float()
-    timestamp = Date()
-    level = Keyword()
-    fuquan = Float()
 
 
 class KdataDay(BaseKData):

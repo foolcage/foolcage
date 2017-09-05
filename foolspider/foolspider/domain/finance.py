@@ -4,6 +4,7 @@ from elasticsearch_dsl import MetaField
 
 
 class BalanceSheet(DocType):
+    id = Keyword()
     securityId = Keyword()
     code = Keyword()
     reportDate = Float()

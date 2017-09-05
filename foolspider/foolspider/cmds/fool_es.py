@@ -34,8 +34,10 @@ def kdata_to_es():
             index.upgrade()
         for kdata_json in get_kdata_items(security_item):
             try:
+                id = '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])
                 kdata_item = KdataDay(
-                    meta={'id': '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])})
+                    meta={'id': id},
+                    id=id)
                 fill_doc_type(kdata_item, kdata_json)
                 kdata_item.save()
             except Exception as e:
@@ -53,8 +55,11 @@ def kdata_houfuquan_to_es():
             index.upgrade()
         for kdata_json in get_kdata_items(security_item, houfuquan=True):
             try:
+                id = '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])
+
                 kdata_item = KdataDayHoufuquan(
-                    meta={'id': '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])})
+                    meta={'id': id},
+                    id=id)
                 fill_doc_type(kdata_item, kdata_json)
                 kdata_item.save()
             except Exception as e:
@@ -66,7 +71,7 @@ def balance_sheet_to_es():
         for json_object in get_balance_sheet_items(security_item):
             try:
                 balance_sheet = BalanceSheet(
-                    meta={'id': '{}_{}'.format(json_object['securityId'], json_object['reportDate'])});
+                    meta={'id': json_object['id']});
                 fill_doc_type(balance_sheet, json_object)
                 balance_sheet.save()
             except Exception as e:
@@ -78,7 +83,7 @@ def income_statement_to_es():
         for json_object in get_income_statement_items(security_item):
             try:
                 income_statement = IncomeStatement(
-                    meta={'id': '{}_{}'.format(json_object['securityId'], json_object['reportDate'])});
+                    meta={'id': json_object['id']});
                 fill_doc_type(income_statement, json_object)
                 income_statement.save()
             except Exception as e:
@@ -90,7 +95,7 @@ def cash_flow_statement_to_es():
         for json_object in get_cash_flow_statement_items(security_item):
             try:
                 cash_flow_statement = CashFlowStatement(
-                    meta={'id': '{}_{}'.format(json_object['securityId'], json_object['reportDate'])});
+                    meta={'id': json_object['id']});
                 fill_doc_type(cash_flow_statement, json_object)
                 cash_flow_statement.save()
             except Exception as e:
