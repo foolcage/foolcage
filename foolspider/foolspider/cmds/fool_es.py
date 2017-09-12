@@ -23,47 +23,35 @@ def security_meta_to_es():
             logger.warn("wrong SecurityItem:{},error:{}", item, e)
 
 
-def kdata_to_es():
+def kdata_to_es(houfuquan=False):
     for security_item in get_security_items():
         # 创建索引
         index = Index(security_item['id'] + "_technical")
-        index.doc_type(KdataDay)
+        if houfuquan:
+            index.doc_type(KdataDayHoufuquan)
+        else:
+            index.doc_type(KdataDay)
+
         if not index.exists():
             index.create()
         else:
             index.upgrade()
-        for kdata_json in get_kdata_items(security_item):
+
+        for kdata_json in get_kdata_items(security_item, houfuquan):
             try:
                 id = '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])
-                kdata_item = KdataDay(
-                    meta={'id': id},
-                    id=id)
+                if houfuquan:
+                    kdata_item = KdataDayHoufuquan(
+                        meta={'id': id},
+                        id=id)
+                else:
+                    kdata_item = KdataDay(
+                        meta={'id': id},
+                        id=id)
                 fill_doc_type(kdata_item, kdata_json)
                 kdata_item.save()
             except Exception as e:
-                logger.warn("wrong KdataDay:{},error:{}", kdata_item, e)
-
-
-def kdata_houfuquan_to_es():
-    for security_item in get_security_items():
-        # 创建索引
-        index = Index(security_item['id'] + "_technical")
-        index.doc_type(KdataDayHoufuquan)
-        if not index.exists():
-            index.create()
-        else:
-            index.upgrade()
-        for kdata_json in get_kdata_items(security_item, houfuquan=True):
-            try:
-                id = '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])
-
-                kdata_item = KdataDayHoufuquan(
-                    meta={'id': id},
-                    id=id)
-                fill_doc_type(kdata_item, kdata_json)
-                kdata_item.save()
-            except Exception as e:
-                logger.warn("wrong KdataDayHoufuquan:{},error:{}", kdata_item, e)
+                logger.warn("wrong KdataDay:{},houfuquan:{},error:{}", kdata_item, houfuquan, e)
 
 
 def balance_sheet_to_es():
@@ -109,4 +97,4 @@ if __name__ == '__main__':
     # balance_sheet_to_es()
     # income_statement_to_es()
     # cash_flow_statement_to_es()
-    kdata_houfuquan_to_es()
+    kdata_to_es()

@@ -119,7 +119,7 @@ def get_tick_items(security_item):
 
 def get_kdata_items(security_item, houfuquan=False):
     if houfuquan:
-        dir = get_fuquan_kdata_dir(security_item)
+        dir = get_kdata_fuquan_dir(security_item)
     else:
         dir = get_kdata_dir(security_item)
     if os.path.exists(dir):
@@ -185,7 +185,7 @@ def setup_env():
 
 
 def mkdir_for_security(item):
-    fuquan_kdata_dir = get_fuquan_kdata_dir(item)
+    fuquan_kdata_dir = get_kdata_fuquan_dir(item)
     if not os.path.exists(fuquan_kdata_dir):
         os.makedirs(fuquan_kdata_dir)
 
@@ -197,22 +197,34 @@ def mkdir_for_security(item):
     if not os.path.exists(tick_dir):
         os.makedirs(tick_dir)
 
+    event_dir = get_event_dir(item)
+    if not os.path.exists(event_dir):
+        os.makedirs(event_dir)
+
 
 def get_security_dir(item):
     return os.path.join(settings.FILES_STORE, item['type'], item['exchange'], item['code'])
+
+
+def get_event_dir(item):
+    return os.path.join(get_security_dir(item), 'event')
+
+
+def get_event_forecast_path(item):
+    return os.path.join(get_event_dir(item), "forecast.json")
 
 
 def get_kdata_dir(item):
     return os.path.join(get_security_dir(item), 'kdata')
 
 
-def get_fuquan_kdata_dir(item):
+def get_kdata_fuquan_dir(item):
     return os.path.join(get_kdata_dir(item), 'fuquan')
 
 
 def get_kdata_path(item, year, quarter, fuquan):
     if fuquan:
-        return os.path.join(get_fuquan_kdata_dir(item), '{}_{}_fuquan_dayk.json'.format(year, quarter))
+        return os.path.join(get_kdata_fuquan_dir(item), '{}_{}_fuquan_dayk.json'.format(year, quarter))
     else:
         return os.path.join(get_kdata_dir(item), '{}_{}_dayk.json'.format(year, quarter))
 
