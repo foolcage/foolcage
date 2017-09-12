@@ -8,6 +8,7 @@ import openpyxl
 
 from foolspider import settings
 from foolspider.items import SecurityItem
+from foolspider.settings import STOCK_START_CODE, STOCK_END_CODE
 
 logger = logging.getLogger(__name__)
 
@@ -56,10 +57,10 @@ def is_sz_stock_file(path):
     return path.endswith(settings.SZ_STOCK_FILE)
 
 
-def get_security_items(start='000001', end='666666'):
+def get_security_items(start=STOCK_START_CODE, end=STOCK_END_CODE):
     for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
                                 get_security_item(get_sz_stock_list_path())):
-        if start <= item['code'] < end:
+        if start <= item['code'] <= end:
             yield item
 
 
@@ -210,7 +211,7 @@ def get_event_dir(item):
     return os.path.join(get_security_dir(item), 'event')
 
 
-def get_event_forecast_path(item):
+def get_forecast_event_path(item):
     return os.path.join(get_event_dir(item), "forecast.json")
 
 

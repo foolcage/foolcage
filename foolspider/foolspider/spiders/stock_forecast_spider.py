@@ -7,7 +7,7 @@ from scrapy import signals
 
 from foolspider.consts import DEFAULT_KDATA_HEADER
 from foolspider.settings import STOCK_START_CODE, STOCK_END_CODE
-from foolspider.utils.utils import mkdir_for_security, get_security_items, get_event_forecast_path
+from foolspider.utils.utils import mkdir_for_security, get_security_items, get_forecast_event_path
 
 
 class StockForecastSpider(scrapy.Spider):
@@ -34,8 +34,9 @@ class StockForecastSpider(scrapy.Spider):
             for tr in trs[1:]:
                 tds = Selector(text=tr).xpath('//td//text()').extract()
                 tds = [x.strip() for x in tds if x.strip()]
-                change_str = tds[7]
 
+                # 业绩变动字符串转为float
+                change_str = tds[7]
                 change_start = None
 
                 if '~' in change_str:
@@ -52,13 +53,20 @@ class StockForecastSpider(scrapy.Spider):
                     change_start = change_start.strip('%')
                     change_start = float(change_start) / 100
 
+                # preEPS可能为空
+                preEPS = None
+                try:
+                    preEPS = float(tds[6])
+                except Exception as e:
+                    pass
+
                 json_item = {"id": '{}_{}'.format(security_item['id'], tds[3]),
                              "securityId": security_item['id'],
                              "reportDate": tds[3],
                              "reportPeriod": tds[4],
                              "type": tds[2],
                              "description": tds[5],
-                             "preEPS": tds[6],
+                             "preEPS": preEPS,
                              "changeStart": change_start,
                              "change": change,
                              }
@@ -66,12 +74,12 @@ class StockForecastSpider(scrapy.Spider):
 
             if forecast_jsons:
                 try:
-                    with open(get_event_forecast_path(security_item), "w") as f:
+                    with open(get_forecast_event_path(security_item), "w") as f:
                         json.dump(forecast_jsons, f, ensure_ascii=False)
                 except Exception as e:
                     self.logger.error(
                         'error when saving forecast url={} path={} error={}'.format(response.url,
-                                                                                    get_event_forecast_path(
+                                                                                    get_forecast_event_path(
                                                                                         security_item), e))
 
 

@@ -1,7 +1,8 @@
 from elasticsearch_dsl import DocType, Keyword, Date, Text, Float
+from elasticsearch_dsl import MetaField
 
 
-class Forecast(DocType):
+class ForecastEvent(DocType):
     id = Keyword()
     securityId = Keyword()
     reportDate = Date()
@@ -9,5 +10,8 @@ class Forecast(DocType):
     type = Keyword()
     description = Text()
     preEPS = Float()
-    min = Float()
-    max = Float()
+    changeStart = Float()
+    change = Float()
+
+    class Meta:
+        all = MetaField(enabled=False)
