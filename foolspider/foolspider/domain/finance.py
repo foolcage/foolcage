@@ -1,4 +1,4 @@
-from elasticsearch_dsl import DocType, Keyword
+from elasticsearch_dsl import DocType, Keyword, Date
 from elasticsearch_dsl import Float
 from elasticsearch_dsl import MetaField
 
@@ -7,7 +7,7 @@ class BalanceSheet(DocType):
     id = Keyword()
     securityId = Keyword()
     code = Keyword()
-    reportDate = Float()
+    reportDate = Date()
     # 货币资金
     moneyFunds = Float()
     # 交易性金融资产

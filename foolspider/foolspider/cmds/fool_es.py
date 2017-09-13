@@ -118,7 +118,7 @@ if __name__ == '__main__':
     from elasticsearch_dsl.connections import connections
 
     connections.create_connection(hosts=['localhost'], timeout=20)
-    # balance_sheet_to_es()
+    balance_sheet_to_es()
     # income_statement_to_es()
     # cash_flow_statement_to_es()
-    forecast_event_to_es()
+    # forecast_event_to_es()

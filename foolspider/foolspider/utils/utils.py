@@ -330,3 +330,10 @@ def get_quarters(start):
 def fill_doc_type(doc_type, json_object):
     for key in json_object:
         doc_type[key] = json_object[key]
+
+
+def to_float(str):
+    try:
+        return float(str)
+    except Exception as e:
+        return None
