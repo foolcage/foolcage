@@ -14,8 +14,8 @@ class StockMeta(DocType):
     listDate = Date()
 
     class Meta:
-        index = 'security_meta'
-        doc_type = 'stock_meta'
+        index = 'stock_meta'
+        doc_type = 'doc'
 
 
 class StockTickItem(DocType):

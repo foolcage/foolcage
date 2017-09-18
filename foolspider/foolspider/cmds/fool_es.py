@@ -5,7 +5,7 @@ from elasticsearch_dsl import Index
 from foolspider.domain.event import ForecastEvent
 from foolspider.domain.finance import BalanceSheet, IncomeStatement, CashFlowStatement
 from foolspider.domain.meta import StockMeta
-from foolspider.domain.technical import KdataDay, KdataDayHoufuquan
+from foolspider.domain.technical import DayKData, HoufuquanDayKData
 from foolspider.utils.event_utils import get_forecast_items
 from foolspider.utils.finance_utils import get_balance_sheet_items, get_income_statement_items, \
     get_cash_flow_statement_items
@@ -39,21 +39,22 @@ def security_meta_to_es():
 def kdata_to_es(houfuquan=False):
     for security_item in get_security_items():
         # 创建索引
-        index_name = security_item['id'] + "_technical"
         if houfuquan:
-            index_mapping(index_name, KdataDayHoufuquan)
+            index_name = security_item['id'] + "houfuquan_day_kdata"
+            index_mapping(index_name, HoufuquanDayKData)
         else:
-            index_mapping(index_name, KdataDay)
+            index_name = security_item['id'] + "day_kdata"
+            index_mapping(index_name, DayKData)
 
         for kdata_json in get_kdata_items(security_item, houfuquan):
             try:
                 id = '{}_{}'.format(kdata_json['securityId'], kdata_json['timestamp'])
                 if houfuquan:
-                    kdata_item = KdataDayHoufuquan(
+                    kdata_item = HoufuquanDayKData(
                         meta={'id': id},
                         id=id)
                 else:
-                    kdata_item = KdataDay(
+                    kdata_item = DayKData(
                         meta={'id': id},
                         id=id)
                 fill_doc_type(kdata_item, kdata_json)
@@ -101,7 +102,7 @@ def cash_flow_statement_to_es():
 def forecast_event_to_es():
     for security_item in get_security_items():
         # 创建索引
-        index_name = security_item['id'] + "_event"
+        index_name = security_item['id'] + "_forecast_event"
         index_mapping(index_name, ForecastEvent)
 
         for json_object in get_forecast_items(security_item):

@@ -184,7 +184,8 @@ class BalanceSheet(DocType):
     totalLiabilitiesAndOwnersEquity = Float()
 
     class Meta:
-        index = 'stock_finance'
+        index = 'balance_sheet'
+        doc_type = 'doc'
         all = MetaField(enabled=False)
 
 
@@ -248,7 +249,8 @@ class IncomeStatement(DocType):
     attributableToMinorityShareholders = Float()
 
     class Meta:
-        index = 'stock_finance'
+        index = 'income_statement'
+        doc_type = 'doc'
         all = MetaField(enabled=False)
 
 
@@ -402,5 +404,6 @@ class CashFlowStatement(DocType):
     netIncreaseInCashAndCashEquivalents = Float()
 
     class Meta:
-        index = 'stock_finance'
+        index = 'cash_flow_statement'
+        doc_type = 'doc'
         all = MetaField(enabled=False)

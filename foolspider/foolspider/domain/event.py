@@ -14,4 +14,5 @@ class ForecastEvent(DocType):
     change = Float()
 
     class Meta:
+        doc_type = 'doc'
         all = MetaField(enabled=False)

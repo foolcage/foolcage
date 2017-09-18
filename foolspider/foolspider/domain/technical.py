@@ -20,11 +20,13 @@ class BaseKData(DocType):
     turnover = Float()
 
 
-class KdataDay(BaseKData):
+class DayKData(BaseKData):
     class Meta:
         all = MetaField(enabled=False)
+        doc_type = 'doc'
 
 
-class KdataDayHoufuquan(BaseKData):
+class HoufuquanDayKData(BaseKData):
     class Meta:
         all = MetaField(enabled=False)
+        doc_type = 'doc'
