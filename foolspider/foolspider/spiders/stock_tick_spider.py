@@ -11,7 +11,9 @@ from foolspider import settings
 from foolspider.consts import DEFAULT_TICK_HEADER
 from foolspider.settings import KAFKA_HOST, AUTO_KAFKA, STOCK_START_CODE, STOCK_END_CODE
 from foolspider.utils.utils import get_security_item, get_sh_stock_list_path, get_trading_dates, get_tick_path, \
-    is_available_tick, get_sz_stock_list_path, get_datetime, get_tick_item, mkdir_for_security
+    is_available_tick, get_sz_stock_list_path, get_datetime, get_tick_item, mkdir_for_security, \
+    get_kdata_item_with_date, \
+    kdata_to_tick
 
 
 # TODO:add start/end date/stocks setting for download ticks
@@ -49,13 +51,18 @@ class StockTickSpider(scrapy.Spider):
 
     def download_tick(self, response):
         content_type_header = response.headers.get('content-type', None)
-
-        if content_type_header.decode("utf-8") == 'application/vnd.ms-excel':
+        if content_type_header.decode("utf-8") == 'application/vnd.ms-excel' or "当天没有数据" in response.body.decode(
+                'GB2312'):
             path = response.meta['path']
             trading_date = response.meta['trading_date']
             item = response.meta['item']
+            if content_type_header.decode("utf-8") == 'application/vnd.ms-excel':
+                content = response.body
+            else:
+                kdata_json = get_kdata_item_with_date(response.meta['item'], response.meta['trading_date'])
+                content = kdata_to_tick(response.meta['item'], kdata_json).encode('GB2312')
             with open(path, "wb") as f:
-                f.write(response.body)
+                f.write(content)
                 f.flush()
                 if AUTO_KAFKA:
                     for tick_item in get_tick_item(path, trading_date, item):

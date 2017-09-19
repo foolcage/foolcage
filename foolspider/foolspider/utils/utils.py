@@ -118,6 +118,26 @@ def get_tick_items(security_item):
             yield get_tick_item(tick_path, trading_date, security_item)
 
 
+def get_kdata_item_with_date(security_item, the_date_str):
+    the_date = get_datetime(the_date_str)
+    the_year_quarter = get_year_quarter(the_date)
+    data_path = get_kdata_path(security_item, the_year_quarter[0], the_year_quarter[1], False)
+
+    with open(data_path) as data_file:
+        kdata_jsons = json.load(data_file)
+        for kdata_json in kdata_jsons:
+            if kdata_json['timestamp'] == the_date_str:
+                return kdata_json
+
+
+# 对于开盘涨停的，算作买盘tick
+def kdata_to_tick(security_item, kdata_json):
+    str = '''成交时间	成交价	价格变动	成交量(手)	成交额(元)	性质
+{}	{}	--	{}	{}	{}'''.format('09:25:00', kdata_json['high'], int(kdata_json['volume']) / 100,
+                                           kdata_json['turnover'], '买盘')
+    return str
+
+
 def get_kdata_items(security_item, houfuquan=False):
     if houfuquan:
         dir = get_kdata_fuquan_dir(security_item)
