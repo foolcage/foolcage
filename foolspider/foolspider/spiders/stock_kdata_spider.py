@@ -18,6 +18,16 @@ from foolspider.utils.utils import get_security_item, get_quarters, mkdir_for_se
 
 class StockKDataSpider(scrapy.Spider):
     name = "stock_kdata"
+
+    custom_settings = {
+        # 'DOWNLOAD_DELAY': 2,
+        # 'CONCURRENT_REQUESTS_PER_DOMAIN': 8,
+
+        'SPIDER_MIDDLEWARES': {
+            'foolspider.middlewares.FoolErrorMiddleware': 1000,
+        }
+    }
+
     if AUTO_KAFKA:
         producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
 

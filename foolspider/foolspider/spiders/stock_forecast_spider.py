@@ -13,6 +13,15 @@ from foolspider.utils.utils import mkdir_for_security, get_security_items, get_f
 class StockForecastSpider(scrapy.Spider):
     name = "stock_forecast"
 
+    custom_settings = {
+        'DOWNLOAD_DELAY': 2,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 8,
+
+        'SPIDER_MIDDLEWARES': {
+            'foolspider.middlewares.FoolErrorMiddleware': 1000,
+        }
+    }
+
     def start_requests(self):
         for item in get_security_items():
             # 设置抓取的股票范围

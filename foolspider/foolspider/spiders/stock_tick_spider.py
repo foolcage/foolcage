@@ -21,8 +21,12 @@ class StockTickSpider(scrapy.Spider):
     name = "stock_tick"
 
     custom_settings = {
-        'DOWNLOAD_DELAY': 5,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 2
+        # 'DOWNLOAD_DELAY': 2,
+        # 'CONCURRENT_REQUESTS_PER_DOMAIN': 8,
+
+        'SPIDER_MIDDLEWARES': {
+            'foolspider.middlewares.FoolErrorMiddleware': 1000,
+        }
     }
 
     if AUTO_KAFKA:
@@ -43,7 +47,8 @@ class StockTickSpider(scrapy.Spider):
                         continue
 
                     yield Request(url=self.get_tick_url(trading_date, item['exchange'] + item['code']),
-                                  meta={'path': path,
+                                  meta={#'proxy': 'http://34.201.226.99:8080',
+                                        'path': path,
                                         'trading_date': trading_date,
                                         'item': item},
                                   headers=DEFAULT_TICK_HEADER,

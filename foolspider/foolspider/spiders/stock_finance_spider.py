@@ -15,8 +15,12 @@ class StockFinanceSpider(scrapy.Spider):
     name = "stock_finance"
 
     custom_settings = {
-        'DOWNLOAD_DELAY': 5,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 2
+        'DOWNLOAD_DELAY': 2,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 8,
+
+        'SPIDER_MIDDLEWARES': {
+            'foolspider.middlewares.FoolErrorMiddleware': 1000,
+        }
     }
 
     if AUTO_KAFKA:
