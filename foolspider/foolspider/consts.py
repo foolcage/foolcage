@@ -1,5 +1,21 @@
 from foolspider.utils.utils import chrome_copy_header_to_dict
 
+HIDEME_NAME_HEADER = chrome_copy_header_to_dict('''
+:authority:hidemy.name
+:method:GET
+:path:/en/proxy-list/
+:scheme:https
+accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+accept-encoding:gzip, deflate, br
+accept-language:zh-CN,zh;q=0.8,en;q=0.6
+cache-control:no-cache
+cookie:__cfduid=dfb07a8e773720a5572e4db25697e08591506091441; _ym_uid=15060914631013163084; jv_enter_ts_EBSrukxUuA=1506091473064; jv_visits_count_EBSrukxUuA=1; jv_refer_EBSrukxUuA=https%3A%2F%2Fhidemy.name%2Fen%2Fproxy-list%2F; jv_utm_EBSrukxUuA=; cf_clearance=bae230b6514e02de06ff029a2394b93971429e1f-1506207013-86400; _ym_isad=2; PAPVisitorId=80da5db2a35772c4e5dccda888d39082; _ga=GA1.2.703376022.1506091464; _gid=GA1.2.1107396455.1506091464; _ym_visorc_42065329=w; jv_pages_count_EBSrukxUuA=28
+pragma:no-cache
+referer:https://hidemy.name/en/proxy-list/?start=64
+upgrade-insecure-requests:1
+user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36
+''')
+
 DEFAULT_SH_HEADER = chrome_copy_header_to_dict('''
 Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
 Accept-Encoding:gzip, deflate, sdch

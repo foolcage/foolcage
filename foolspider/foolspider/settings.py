@@ -105,3 +105,7 @@ DOWNLOAD_TXT_ENCODING = 'GB2312'
 AUTO_KAFKA = False
 KAFKA_HOST = 'localhost:9092'
 # LOG_FILE = 'log.txt'
+
+DG_PATH = '/Users/xuanqi/software/delegate/DGROOT/bin/delegate'
+HTTP_PROXY_ITEMS_PATH = 'data/http_proxy_items.txt'
+SOCKS_PROXY_ITEMS_PATH = 'data/socks_proxy_items.txt'

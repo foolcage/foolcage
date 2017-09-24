@@ -72,3 +72,12 @@ class SectorItem(scrapy.Item):
 class StockSectorItem(scrapy.Item):
     stock_id = scrapy.Field()
     sector_id = scrapy.Field()
+
+
+class ProxyItem(scrapy.Item):
+    ip = scrapy.Field();
+    port = scrapy.Field();
+    location = scrapy.Field();
+    speed = scrapy.Field();
+    type = scrapy.Field();
+    anonymity = scrapy.Field();
