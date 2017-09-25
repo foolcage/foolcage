@@ -26,11 +26,11 @@ def crawl():
     # yield runner.crawl(SecurityListSpider)
     # yield runner.crawl(StockKDataSpider)
 
-    # yield runner.crawl(StockTickSpider)
+    yield runner.crawl(StockTickSpider)
     # yield runner.crawl(StockFinanceSpider)
     # yield runner.crawl(StockGNSpider)
     # yield runner.crawl(StockForecastSpider)
-    yield runner.crawl(ProxySpider)
+    # yield runner.crawl(ProxySpider)
 
     reactor.stop()
 

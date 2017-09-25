@@ -107,5 +107,12 @@ KAFKA_HOST = 'localhost:9092'
 # LOG_FILE = 'log.txt'
 
 DG_PATH = '/Users/xuanqi/software/delegate/DGROOT/bin/delegate'
-HTTP_PROXY_ITEMS_PATH = 'data/http_proxy_items.txt'
-SOCKS_PROXY_ITEMS_PATH = 'data/socks_proxy_items.txt'
+HTTP_PROXY_ITEMS_PATH = 'data/http_proxy_items.json'
+SOCKS_PROXY_ITEMS_PATH = 'data/socks_proxy_items.json'
+
+SUPPORT_SOCKS2HTTP = False
+
+
+g_socks_proxy_items = []
+g_http_proxy_items = []
+g_socks2http_proxy_items = {}

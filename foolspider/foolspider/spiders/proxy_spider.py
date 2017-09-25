@@ -6,7 +6,7 @@ from scrapy import Selector
 from scrapy import signals
 
 from foolspider.consts import HIDEME_NAME_HEADER
-from foolspider.proxy.proxy_manager import socks2http_proxy_items
+from foolspider.proxy.proxy_manager import g_socks2http_proxy_items
 from foolspider.utils.utils import get_forecast_event_path
 
 
@@ -16,8 +16,8 @@ class ProxySpider(scrapy.Spider):
     def start_requests(self):
         url = self.get_proxy_url(0)
         meta = {}
-        if socks2http_proxy_items.get('127.0.0.1:1081'):
-            meta['proxy'] = socks2http_proxy_items['127.0.0.1:1081']
+        if g_socks2http_proxy_items.get('127.0.0.1:1081'):
+            meta['proxy'] = g_socks2http_proxy_items['127.0.0.1:1081']
         yield Request(url=url,
                       headers=HIDEME_NAME_HEADER,
                       meta={'proxy': 'http://127.0.0.1:10000'},

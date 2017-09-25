@@ -3,7 +3,8 @@ import socket
 import subprocess
 from contextlib import closing
 
-from foolspider.settings import DG_PATH, HTTP_PROXY_ITEMS_PATH
+from foolspider import settings
+from foolspider.settings import DG_PATH, HTTP_PROXY_ITEMS_PATH, SUPPORT_SOCKS2HTTP, g_socks2http_proxy_items
 
 
 def start_delegate(proxy):
@@ -40,41 +41,33 @@ def check_port(port):
     return False
 
 
-socks_proxy_items = []
-http_proxy_items = []
-socks2http_proxy_items = {}
-
-
 def int_proxy():
-    global socks2http_proxy_items
-    global http_proxy_items
-    global socks_proxy_items
+    if SUPPORT_SOCKS2HTTP:
+        my_1080 = {'ip': '127.0.0.1',
+                   'port': 1080,
+                   'location': 'foolcage',
+                   'speed': '1',
+                   'type': 'socks',
+                   'anonymity': 'high'
+                   }
+        my_1081 = {'ip': '127.0.0.1',
+                   'port': 1081,
+                   'location': 'foolcage',
+                   'speed': '1',
+                   'type': 'socks',
+                   'anonymity': 'high'
+                   }
+        g_socks2http_proxy_items['{}:{}'.format(my_1080['ip'], + my_1080['port'])] = start_delegate(my_1080)
 
-    my_1080 = {'ip': '127.0.0.1',
-               'port': 1080,
-               'location': 'foolcage',
-               'speed': '1',
-               'type': 'socks',
-               'anonymity': 'high'
-               }
-    my_1081 = {'ip': '127.0.0.1',
-               'port': 1081,
-               'location': 'foolcage',
-               'speed': '1',
-               'type': 'socks',
-               'anonymity': 'high'
-               }
-    socks2http_proxy_items['{}:{}'.format(my_1080['ip'], + my_1080['port'])] = start_delegate(my_1080)
-
-    socks2http_proxy_items['{}:{}'.format(my_1081['ip'], + my_1081['port'])] = start_delegate(my_1081)
+        g_socks2http_proxy_items['{}:{}'.format(my_1081['ip'], + my_1081['port'])] = start_delegate(my_1081)
     try:
         with open(HTTP_PROXY_ITEMS_PATH) as fr:
             items = json.load(fr)
-            http_proxy_items = http_proxy_items + items
+            settings.g_http_proxy_items = settings.g_http_proxy_items + items
     except Exception as e:
         print(e)
 
 
 def release_socks2http_proxy():
-    for _, item in socks2http_proxy_items:
+    for _, item in g_socks2http_proxy_items:
         stop_delegate(item['port'])

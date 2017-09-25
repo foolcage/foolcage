@@ -16,7 +16,6 @@ from foolspider.utils.utils import get_security_item, get_sh_stock_list_path, ge
     kdata_to_tick
 
 
-# TODO:add start/end date/stocks setting for download ticks
 class StockTickSpider(scrapy.Spider):
     name = "stock_tick"
 
@@ -33,6 +32,9 @@ class StockTickSpider(scrapy.Spider):
         producer = KafkaProducer(bootstrap_servers=KAFKA_HOST)
 
     def start_requests(self):
+        proxy_count = len(settings.g_http_proxy_items)
+        count = 0
+
         for item in itertools.chain(get_security_item(get_sh_stock_list_path()),
                                     get_security_item(get_sz_stock_list_path())):
             if STOCK_START_CODE <= item['code'] <= STOCK_END_CODE:
@@ -45,9 +47,11 @@ class StockTickSpider(scrapy.Spider):
 
                     if os.path.isfile(path) and is_available_tick(path):
                         continue
-
+                    proxy_json = settings.g_http_proxy_items[count % proxy_count]
+                    count += 1
+                    proxy = 'http://{}:{}'.format(proxy_json['ip'], proxy_json['port'])
                     yield Request(url=self.get_tick_url(trading_date, item['exchange'] + item['code']),
-                                  meta={#'proxy': 'http://34.201.226.99:8080',
+                                  meta={'proxy': proxy,
                                         'path': path,
                                         'trading_date': trading_date,
                                         'item': item},
@@ -55,6 +59,7 @@ class StockTickSpider(scrapy.Spider):
                                   callback=self.download_tick)
 
     def download_tick(self, response):
+        self.logger.info('using proxy:{}'.format(response.meta['proxy']))
         content_type_header = response.headers.get('content-type', None)
         if content_type_header.decode("utf-8") == 'application/vnd.ms-excel' or "当天没有数据" in response.body.decode(
                 'GB2312'):
